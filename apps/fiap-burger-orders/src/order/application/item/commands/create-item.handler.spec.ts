@@ -42,7 +42,7 @@ describe('CreateItemHandler', () => {
     repository.findByName = async () => null;
   });
 
-  it('should create a new Preparation', async () => {
+  it('should create a new Item', async () => {
     jest.spyOn(repository, 'create').mockResolvedValue();
     jest.spyOn(repository, 'findByName').mockResolvedValue(null);
     const command = new CreateItemCommand({

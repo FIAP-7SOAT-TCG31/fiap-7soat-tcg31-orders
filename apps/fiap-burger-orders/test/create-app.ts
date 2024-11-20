@@ -3,7 +3,7 @@ import { AppModule } from '../src/app.module';
 
 export const env = {
   APP_NAME: 'fiap-burger-orders-test-app',
-  APP_DESCRIPTION: 'Preparations Component for Fiap Burger',
+  APP_DESCRIPTION: 'Orders Component for Fiap Burger',
   APP_VERSION: '1.0.0',
 };
 
