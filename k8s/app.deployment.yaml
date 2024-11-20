@@ -2,26 +2,26 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fiap-burger-preparation
+  name: fiap-burger-orders
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: fiap-burger-preparation
+      app: fiap-burger-orders
   template:
     metadata:
       labels:
-        app: fiap-burger-preparation
+        app: fiap-burger-orders
     spec:
       terminationGracePeriod: 90
       automountServiceAccountToken: false
       containers:
-        - name: fiap-burger-preparation-app
-          image: gm50x/fiap-burger-preparation:latest
+        - name: fiap-burger-orders-app
+          image: gm50x/fiap-burger-orders:latest
           imagePullPolicy: Always
           envFrom:
             - secretRef:
-                name: fiap-burger-preparation
+                name: fiap-burger-orders
           env:
             - name: NODE_ENV
               value: "production"
@@ -70,12 +70,12 @@ spec:
 apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: fiap-burger-preparation-hpa
+  name: fiap-burger-orders-hpa
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: fiap-burger-preparation
+    name: fiap-burger-orders
   minReplicas: 2
   maxReplicas: 10
   behavior:
@@ -102,10 +102,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: fiap-burger-preparation-lb-srv
+  name: fiap-burger-orders-lb-srv
 spec:
   selector:
-    app: fiap-burger-preparation
+    app: fiap-burger-orders
   type: LoadBalancer
   ports:
     - name: http

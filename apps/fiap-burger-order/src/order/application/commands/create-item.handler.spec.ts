@@ -1,0 +1,53 @@
+import { TransactionManager } from '@fiap-burger/tactical-design/core';
+import {
+  FakeRepository,
+  FakeTransactionManager,
+} from '@fiap-burger/test-factory/utils';
+import { INestApplication } from '@nestjs/common';
+import { Test, TestingModule } from '@nestjs/testing';
+import { ItemRepository } from '../abstractions/item.repository';
+import { CreateItemCommand } from './create-item.command';
+import { CreateItemHandler } from './create-item.handler';
+
+describe('CreateItemHandler', () => {
+  let app: INestApplication;
+  let target: CreateItemHandler;
+  let repository: ItemRepository;
+
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  beforeEach(async () => {
+    const moduleFixture: TestingModule = await Test.createTestingModule({
+      providers: [
+        CreateItemHandler,
+        {
+          provide: TransactionManager,
+          useClass: FakeTransactionManager,
+        },
+        {
+          provide: ItemRepository,
+          useClass: FakeRepository,
+        },
+      ],
+    }).compile();
+
+    app = moduleFixture.createNestApplication();
+    target = app.get(CreateItemHandler);
+    repository = app.get(ItemRepository);
+  });
+
+  it('should create a new Preparation', async () => {
+    jest.spyOn(repository, 'create').mockResolvedValue();
+    const command = new CreateItemCommand({
+      name: 'X-Burger',
+      description: 'Dummy',
+      price: 12.99,
+      type: 'Snack',
+      images: ['https://anyurl.com'],
+    });
+    await target.execute(command);
+    expect(repository.create).toHaveBeenCalled();
+  });
+});
