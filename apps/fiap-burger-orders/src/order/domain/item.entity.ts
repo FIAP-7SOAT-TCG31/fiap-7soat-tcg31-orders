@@ -2,17 +2,18 @@ import { Entity } from '@fiap-burger/tactical-design/core';
 import { ItemTypes } from './values/item-type.value';
 
 export class Item extends Entity {
+  private _images: string[] = [];
   constructor(
     protected readonly _id: string,
     private _name: string,
     private _price: number,
     private _type: ItemTypes,
     private _description: string,
-    private _images: string[] = [],
+    images: string[] = null,
   ) {
     super(_id);
-    if (_images?.length) {
-      this._images = _images.map((x) => x);
+    if (images?.length) {
+      this._images = this.uniqueImages(images);
     }
   }
 
@@ -52,11 +53,11 @@ export class Item extends Entity {
     return this._images.map((x) => x);
   }
 
-  addImage(image: string) {
-    this._images.push(image);
+  set images(value: string[]) {
+    this._images = this.uniqueImages(value);
   }
 
-  removeImage(image: string) {
-    this._images = this._images.filter((x) => x !== image);
+  private uniqueImages(images: string[]) {
+    return Array.from(new Set(images));
   }
 }

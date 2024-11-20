@@ -17,22 +17,4 @@ describe('Item', () => {
     expect(target).toBeInstanceOf(Item);
     expect(target.images).toEqual(expect.arrayContaining(images));
   });
-
-  it('should add new image', () => {
-    const target = new Item(id, name, price, 'Dessert', description, images);
-    const imageURL = 'otherUrl.com';
-    target.addImage(imageURL);
-    expect(target.images).toEqual(
-      expect.arrayContaining([...images, imageURL]),
-    );
-  });
-
-  it('should remove image', () => {
-    const target = new Item(id, name, price, 'Dessert', description, images);
-    const imageURL = 'otherUrl.com';
-    target.addImage(imageURL);
-    target.removeImage(imageURL);
-    expect(target.images).toEqual(expect.arrayContaining(images));
-    expect(target.images).toHaveLength(1);
-  });
 });
