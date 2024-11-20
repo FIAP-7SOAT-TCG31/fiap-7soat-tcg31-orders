@@ -1,6 +1,14 @@
 import { Controller, Get, Param } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
+import { Item } from '../../application/item/dtos/item.dto';
 import {
   GetItemByIdQuery,
   GetItemByIdResult,
@@ -13,6 +21,14 @@ export class GetItemByIdController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Find an item with its id',
+    description: 'Returns an existing item by querying it with its id',
+  })
+  @ApiOkResponse({ type: Item })
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
   async execute(@Param('id', new ObjectIdValidationPipe()) id: string) {
     const result = await this.queryBus.execute<
       GetItemByIdQuery,

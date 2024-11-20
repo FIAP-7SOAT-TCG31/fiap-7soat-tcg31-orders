@@ -1,6 +1,13 @@
-import { Body, Controller, Param, Put } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Put } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
-import { ApiTags } from '@nestjs/swagger';
+import {
+  ApiBadRequestResponse,
+  ApiInternalServerErrorResponse,
+  ApiNoContentResponse,
+  ApiNotFoundResponse,
+  ApiOperation,
+  ApiTags,
+} from '@nestjs/swagger';
 import { UpdateItemCommand } from '../../application/item/commands/update-item.command';
 import { UpdateItemInput } from '../../application/item/dtos/update-item.input';
 import { ObjectIdValidationPipe } from '../../infra/pipes/object-id-validation.pipe';
@@ -11,6 +18,15 @@ export class UpdateItemController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Put(':id')
+  @ApiOperation({
+    summary: 'Updates an existing item',
+    description: 'Updates values of an existing item',
+  })
+  @ApiNoContentResponse()
+  @ApiNotFoundResponse()
+  @ApiBadRequestResponse()
+  @ApiInternalServerErrorResponse()
+  @HttpCode(204)
   async execute(
     @Param('id', new ObjectIdValidationPipe()) id: string,
     @Body() data: UpdateItemInput,

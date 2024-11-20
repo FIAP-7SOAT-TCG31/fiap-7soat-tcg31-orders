@@ -40,7 +40,7 @@ export class AppConfig implements CommonOptionsFactory {
         // { url: 'https://app.fiapburger.dev', description: 'production' },
         // { url: 'https://stg-app.fiapburger.dev', description: 'staging' },
         // { url: 'https://dev-app.fiapburger.dev', description: 'development' },
-        { url: 'https://localhost:3000', description: 'development' },
+        { url: 'http://localhost:3000', description: 'development' },
       ],
     };
   }
