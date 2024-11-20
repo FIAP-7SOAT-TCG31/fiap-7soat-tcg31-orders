@@ -24,6 +24,14 @@ export class Item extends Entity {
     this._name = value;
   }
 
+  get type() {
+    return this._type;
+  }
+
+  set type(value: ItemTypes) {
+    this._type = value;
+  }
+
   get price() {
     return this._price;
   }

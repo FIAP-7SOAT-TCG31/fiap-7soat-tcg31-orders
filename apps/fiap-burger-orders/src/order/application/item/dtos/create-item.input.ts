@@ -6,14 +6,14 @@ import {
   IsPositive,
   IsString,
 } from 'class-validator';
-import { EItemType, ItemTypes } from '../../domain/values/item-type.value';
+import { EItemType, ItemTypes } from '../../../domain/values/item-type.value';
 
 export class CreateItemInput {
   @ApiProperty()
   @IsString()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: EItemType })
   @IsEnum(EItemType)
   type: ItemTypes;
 

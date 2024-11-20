@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 export const withPrefix = (value: string) =>
-  `${toDottedNotation('FiapBurgerPreparation')}.${toDottedNotation(value)}`;
+  `${toDottedNotation('FiapBurgerOrder')}.${toDottedNotation(value)}`;
 
 @Injectable()
 export class AmqpConfig implements AmqpOptionsFactory {
@@ -20,7 +20,7 @@ export class AmqpConfig implements AmqpOptionsFactory {
     return {
       url,
       appName,
-      prefix: 'FiapBurgerPreparation',
+      prefix: 'FiapBurgerOrder',
       trafficInspection: { mode: inspectionMode },
       waitForConnection: isCI,
       exchanges: [
