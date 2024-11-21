@@ -9,20 +9,17 @@ import { randomUUID } from 'crypto';
 import { Item } from '../../../domain/item.entity';
 import { Order } from '../../../domain/order.aggregate';
 import { OrderStatus } from '../../../domain/values/order-status.value';
-import { ItemRepository } from '../../item/abstractions/item.repository';
 import { OrderRepository } from '../abstractions/order.repository';
-import { AddItemsToOrderCommand } from './add-items-to-order.command';
-import { AddItemsToOrderHandler } from './add-items-to-order.handler';
+import { RemoveItemsFromOrderCommand } from './remove-items-from-order.command';
+import { RemoveItemsFromOrderHandler } from './remove-items-from-order.handler';
 
-describe('AddItemsToOrderHandler', () => {
+describe('RemoveItemsFromOrderHandler', () => {
   let app: INestApplication;
-  let target: AddItemsToOrderHandler;
+  let target: RemoveItemsFromOrderHandler;
   let orderRepository: OrderRepository;
-  let itemRepository: ItemRepository;
 
   const itemPrice = 19.9;
-
-  const fakeFindItemById = async (id: string) =>
+  const createItem = (id: string = randomUUID()) =>
     new Item(
       id,
       'X-Burger',
@@ -38,7 +35,7 @@ describe('AddItemsToOrderHandler', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        AddItemsToOrderHandler,
+        RemoveItemsFromOrderHandler,
         {
           provide: TransactionManager,
           useClass: FakeTransactionManager,
@@ -47,25 +44,20 @@ describe('AddItemsToOrderHandler', () => {
           provide: OrderRepository,
           useClass: FakeRepository,
         },
-        {
-          provide: ItemRepository,
-          useClass: FakeRepository,
-        },
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    target = app.get(AddItemsToOrderHandler);
+    target = app.get(RemoveItemsFromOrderHandler);
     orderRepository = app.get(OrderRepository);
-    itemRepository = app.get(ItemRepository);
   });
 
   it('should throw NotFoundException when Order does not exist', async () => {
     jest.spyOn(orderRepository, 'findById').mockResolvedValue(null);
     jest.spyOn(orderRepository, 'update');
-    const command = new AddItemsToOrderCommand({
+    const command = new RemoveItemsFromOrderCommand({
       id: '123',
-      items: [{ id: '123' }],
+      items: [{ key: '123' }],
     });
     await expect(() => target.execute(command)).rejects.toThrow(
       NotFoundException,
@@ -73,31 +65,29 @@ describe('AddItemsToOrderHandler', () => {
     expect(orderRepository.update).not.toHaveBeenCalled();
   });
 
-  it('should ignore when provided items do not exist', async () => {
+  it('should ignore when no items were provided', async () => {
     const order = new Order(randomUUID(), null, OrderStatus.initiate());
     jest.spyOn(orderRepository, 'findById').mockResolvedValue(order);
     jest.spyOn(orderRepository, 'update');
-    jest.spyOn(itemRepository, 'findById').mockResolvedValue(null);
-    const command = new AddItemsToOrderCommand({
-      id: '123',
-      items: [{ id: '123' }],
-    });
+    const command = new RemoveItemsFromOrderCommand({ id: '123', items: [] });
     await target.execute(command);
     expect(orderRepository.update).not.toHaveBeenCalled();
   });
 
-  it('should add items to existing order', async () => {
+  it('should remove item from order', async () => {
     const order = new Order(randomUUID(), null, OrderStatus.initiate());
+    order.addItem(createItem());
+    order.addItem(createItem());
     jest.spyOn(orderRepository, 'findById').mockResolvedValue(order);
     jest.spyOn(orderRepository, 'update').mockResolvedValue();
-    jest.spyOn(itemRepository, 'findById').mockImplementation(fakeFindItemById);
-    const command = new AddItemsToOrderCommand({
+    const [itemToRemove] = order.items;
+    const command = new RemoveItemsFromOrderCommand({
       id: '123',
-      items: [{ id: '123' }, { id: '123' }],
+      items: [itemToRemove],
     });
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
-    expect(order.items.length).toBe(command.data.items.length);
-    expect(order.total).toEqual(command.data.items.length * itemPrice);
+    expect(order.items.length).toBe(1);
+    expect(order.total).toBe(order.items.length * itemPrice);
   });
 });

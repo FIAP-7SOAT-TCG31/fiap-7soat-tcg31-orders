@@ -7,6 +7,7 @@ import { FindItemsHandler } from './item/queries/find-items.handler';
 import { GetItemByIdHandler } from './item/queries/get-item-by-id.handler';
 import { AddItemsToOrderHandler } from './order/commands/add-items-to-order.handler';
 import { CreateOrderHandler } from './order/commands/create-order.handler';
+import { RemoveItemsFromOrderHandler } from './order/commands/remove-items-from-order.handler';
 import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
 
 const QueryHandlers = [
@@ -19,6 +20,7 @@ const CommandHandlers = [
   UpdateItemHandler,
   CreateOrderHandler,
   AddItemsToOrderHandler,
+  RemoveItemsFromOrderHandler,
 ];
 
 @Module({
