@@ -39,6 +39,9 @@ export class MongooseOrderSchema extends MongooseEntitySchema {
 
   @Prop({ type: [MongooseOrderItemSchema] })
   items: MongooseOrderItemSchema[];
+
+  @Prop()
+  paymentId?: string;
 }
 
 export const MongooseOrderSchemaModel =

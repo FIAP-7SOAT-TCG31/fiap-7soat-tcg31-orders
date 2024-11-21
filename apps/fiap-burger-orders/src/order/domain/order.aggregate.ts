@@ -14,6 +14,7 @@ export class Order extends AggregateRoot {
     private _status: OrderStatus = OrderStatus.initiate(),
     private _total: number = 0,
     private readonly _items: OrderItem[] = [],
+    private _paymentId: string = null,
   ) {
     super(_id);
   }
@@ -32,6 +33,10 @@ export class Order extends AggregateRoot {
 
   get items() {
     return this._items.map((x) => new OrderItem(x.key, x.name, x.price));
+  }
+
+  get paymentId() {
+    return this._paymentId;
   }
 
   addItem(item: Item) {
@@ -67,12 +72,13 @@ export class Order extends AggregateRoot {
     this.calculatePrice(-item.price);
   }
 
-  checkout() {
-    this.apply(new OrderCheckedOut());
+  checkout(paymentId: string) {
+    this.apply(new OrderCheckedOut(paymentId));
   }
 
-  onOrderCheckedOut() {
+  onOrderCheckedOut(event: OrderCheckedOut) {
     this._status = this._status.request();
+    this._paymentId = event.paymentId;
   }
 
   private calculatePrice(itemPrice: number) {

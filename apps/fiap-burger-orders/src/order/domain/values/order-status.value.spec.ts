@@ -8,11 +8,8 @@ import {
 const AllStatuses: OrderStatusValues[] = [
   'Initiated',
   'Requested',
-  'WaitingPayment',
-  'InPreparation',
-  'ReadyForPickup',
+  'Rejected',
   'Completed',
-  'PaymentRejected',
 ];
 
 describe('OrderStatus', () => {
@@ -35,70 +32,31 @@ describe('OrderStatus', () => {
   describe.each([
     [EOrderStatus.Initiated, EOrderStatus.Initiated, false],
     [EOrderStatus.Initiated, EOrderStatus.Completed, false],
-    [EOrderStatus.Initiated, EOrderStatus.InPreparation, false],
-    [EOrderStatus.Initiated, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.Initiated, EOrderStatus.ReadyForPickup, false],
+    [EOrderStatus.Initiated, EOrderStatus.Rejected, false],
     [EOrderStatus.Initiated, EOrderStatus.Requested, true],
-    [EOrderStatus.Initiated, EOrderStatus.WaitingPayment, false],
 
     [EOrderStatus.Requested, EOrderStatus.Initiated, false],
-    [EOrderStatus.Requested, EOrderStatus.Completed, false],
-    [EOrderStatus.Requested, EOrderStatus.InPreparation, false],
-    [EOrderStatus.Requested, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.Requested, EOrderStatus.ReadyForPickup, false],
+    [EOrderStatus.Requested, EOrderStatus.Completed, true],
+    [EOrderStatus.Requested, EOrderStatus.Rejected, true],
     [EOrderStatus.Requested, EOrderStatus.Requested, false],
-    [EOrderStatus.Requested, EOrderStatus.WaitingPayment, true],
-
-    [EOrderStatus.WaitingPayment, EOrderStatus.Initiated, false],
-    [EOrderStatus.WaitingPayment, EOrderStatus.Completed, false],
-    [EOrderStatus.WaitingPayment, EOrderStatus.InPreparation, true],
-    [EOrderStatus.WaitingPayment, EOrderStatus.PaymentRejected, true],
-    [EOrderStatus.WaitingPayment, EOrderStatus.ReadyForPickup, false],
-    [EOrderStatus.WaitingPayment, EOrderStatus.Requested, false],
-    [EOrderStatus.WaitingPayment, EOrderStatus.WaitingPayment, false],
-
-    [EOrderStatus.InPreparation, EOrderStatus.Initiated, false],
-    [EOrderStatus.InPreparation, EOrderStatus.Completed, false],
-    [EOrderStatus.InPreparation, EOrderStatus.InPreparation, false],
-    [EOrderStatus.InPreparation, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.InPreparation, EOrderStatus.ReadyForPickup, true],
-    [EOrderStatus.InPreparation, EOrderStatus.Requested, false],
-    [EOrderStatus.InPreparation, EOrderStatus.WaitingPayment, false],
-
-    [EOrderStatus.ReadyForPickup, EOrderStatus.Initiated, false],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.Completed, true],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.InPreparation, false],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.ReadyForPickup, false],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.Requested, false],
-    [EOrderStatus.ReadyForPickup, EOrderStatus.WaitingPayment, false],
 
     [EOrderStatus.Completed, EOrderStatus.Initiated, false],
     [EOrderStatus.Completed, EOrderStatus.Completed, false],
-    [EOrderStatus.Completed, EOrderStatus.InPreparation, false],
-    [EOrderStatus.Completed, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.Completed, EOrderStatus.ReadyForPickup, false],
+    [EOrderStatus.Completed, EOrderStatus.Rejected, false],
     [EOrderStatus.Completed, EOrderStatus.Requested, false],
-    [EOrderStatus.Completed, EOrderStatus.WaitingPayment, false],
 
-    [EOrderStatus.PaymentRejected, EOrderStatus.Initiated, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.Completed, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.InPreparation, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.ReadyForPickup, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.Requested, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.WaitingPayment, false],
+    [EOrderStatus.Rejected, EOrderStatus.Initiated, false],
+    [EOrderStatus.Rejected, EOrderStatus.Completed, false],
+    [EOrderStatus.Rejected, EOrderStatus.Rejected, false],
+    [EOrderStatus.Rejected, EOrderStatus.Requested, false],
   ])('Order Status Transitions', (from, to, success) => {
     it(`should${success ? ' ' : ' not '}allow transition from ${from} to ${to}`, () => {
       const target = OrderStatus.create(from as OrderStatusValues);
       const methods: Record<OrderStatusValues, string> = {
         Completed: 'complete',
         Initiated: 'initiate',
-        InPreparation: 'prepare',
-        PaymentRejected: 'reject',
-        ReadyForPickup: 'readyForPickup',
         Requested: 'request',
-        WaitingPayment: 'waitPayment',
+        Rejected: 'reject',
       };
       const method = methods[to];
       if (success) {

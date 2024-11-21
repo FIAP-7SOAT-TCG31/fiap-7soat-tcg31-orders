@@ -3,11 +3,8 @@ import { StatusTransitionException } from '../errors/status-transition.exception
 export enum EOrderStatus {
   Initiated = 'Initiated',
   Requested = 'Requested',
-  WaitingPayment = 'WaitingPayment',
-  InPreparation = 'InPreparation',
-  ReadyForPickup = 'ReadyForPickup',
   Completed = 'Completed',
-  PaymentRejected = 'PaymentRejected',
+  Rejected = 'Rejected',
 }
 
 export type OrderStatusValues = `${EOrderStatus}`;
@@ -23,11 +20,8 @@ export abstract class OrderStatus {
     const StatusMap: Record<OrderStatusValues, new () => OrderStatus> = {
       Initiated: InitiatedOrderStatus,
       Requested: RequestedOrderStatus,
-      WaitingPayment: WaitingPaymentOrderStatus,
-      InPreparation: InPreparationOrderStatus,
-      ReadyForPickup: ReadyForPickupOrderStatus,
       Completed: CompletedOrderStatus,
-      PaymentRejected: PaymentRejectedOrderStatus,
+      Rejected: RejectedOrderStatus,
     };
 
     const Status = StatusMap[value];
@@ -47,36 +41,12 @@ export abstract class OrderStatus {
     throw new StatusTransitionException(this._value, EOrderStatus.Requested);
   }
 
-  waitPayment(): OrderStatus {
-    throw new StatusTransitionException(
-      this._value,
-      EOrderStatus.WaitingPayment,
-    );
-  }
-
-  prepare(): OrderStatus {
-    throw new StatusTransitionException(
-      this._value,
-      EOrderStatus.InPreparation,
-    );
-  }
-
-  readyForPickup(): OrderStatus {
-    throw new StatusTransitionException(
-      this._value,
-      EOrderStatus.ReadyForPickup,
-    );
-  }
-
   complete(): OrderStatus {
     throw new StatusTransitionException(this._value, EOrderStatus.Completed);
   }
 
   reject(): OrderStatus {
-    throw new StatusTransitionException(
-      this._value,
-      EOrderStatus.PaymentRejected,
-    );
+    throw new StatusTransitionException(this._value, EOrderStatus.Rejected);
   }
 }
 
@@ -91,36 +61,12 @@ class InitiatedOrderStatus extends OrderStatus {
 class RequestedOrderStatus extends OrderStatus {
   protected _value: OrderStatusValues = 'Requested';
 
-  waitPayment() {
-    return OrderStatus.create('WaitingPayment');
-  }
-}
-
-class WaitingPaymentOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'WaitingPayment';
-
-  prepare() {
-    return OrderStatus.create('InPreparation');
+  complete() {
+    return OrderStatus.create('Completed');
   }
 
   reject() {
-    return OrderStatus.create('PaymentRejected');
-  }
-}
-
-class InPreparationOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'InPreparation';
-
-  readyForPickup() {
-    return OrderStatus.create('ReadyForPickup');
-  }
-}
-
-class ReadyForPickupOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'ReadyForPickup';
-
-  complete() {
-    return OrderStatus.create('Completed');
+    return OrderStatus.create('Rejected');
   }
 }
 
@@ -128,6 +74,6 @@ class CompletedOrderStatus extends OrderStatus {
   protected _value: OrderStatusValues = 'Completed';
 }
 
-class PaymentRejectedOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'PaymentRejected';
+class RejectedOrderStatus extends OrderStatus {
+  protected _value: OrderStatusValues = 'Rejected';
 }
