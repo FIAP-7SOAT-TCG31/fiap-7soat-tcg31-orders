@@ -88,6 +88,7 @@ describe('RemoveItemsFromOrderHandler', () => {
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
     expect(order.items.length).toBe(1);
-    expect(order.total).toBe(order.items.length * itemPrice);
+    const expectedPrice = Number((itemPrice * order.items.length).toFixed(2));
+    expect(order.total).toBe(expectedPrice);
   });
 });

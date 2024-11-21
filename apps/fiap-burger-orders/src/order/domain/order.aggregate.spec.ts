@@ -52,10 +52,10 @@ describe('Order', () => {
     const anotherItem = new Item('2', 'XEgg', 14.99, 'Dessert', 'desc');
     target.addItem(anItem);
     target.addItem(anotherItem);
-    target.checkout();
+    target.checkout('paymentId', 'qrCode');
     expect(target.total).toBe(anItem.price + anotherItem.price);
     expect((target as any).applyEvent).toHaveBeenCalledWith(
-      new OrderCheckedOut(),
+      new OrderCheckedOut('paymentId', 'qrCode'),
     );
   });
 
@@ -64,7 +64,7 @@ describe('Order', () => {
     const anItem = new Item('1', 'XBurger', 12.99, 'Dessert', 'desc');
     const anotherItem = new Item('2', 'XEgg', 14.99, 'Dessert', 'desc');
     target.addItem(anItem);
-    target.checkout();
+    target.checkout('paymentId', 'qrCode');
 
     const [item] = target.items;
 

@@ -108,6 +108,7 @@ describe('CreateOrderHandler', () => {
     await target.execute(command);
     expect(orderRepository.create).toHaveBeenCalled();
     expect(itemRepository.findById).toHaveBeenCalledTimes(items.length);
-    expect(order.total).toEqual(itemPrice * items.length);
+    const expectedPrice = Number((itemPrice * items.length).toFixed(2));
+    expect(order.total).toEqual(expectedPrice);
   });
 });

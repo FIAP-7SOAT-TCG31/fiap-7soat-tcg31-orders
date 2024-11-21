@@ -6,6 +6,7 @@ import { FindItemsController } from './item/find-items.controller';
 import { GetItemByIdController } from './item/get-item-by-id.controller';
 import { UpdateItemController } from './item/update-item.controller';
 import { AddItemsToOrderController } from './order/add-items-to-order.controller';
+import { CheckoutOrderController } from './order/checkout-order.controller';
 import { CreateOrderController } from './order/create-order.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
 import { RemoveItemsFromOrderController } from './order/remove-items-from-order.controller';
@@ -19,6 +20,7 @@ const HttpDrivers = [
   GetOrderByIdController,
   AddItemsToOrderController,
   RemoveItemsFromOrderController,
+  CheckoutOrderController,
 ];
 const AmqpDrivers = [];
 

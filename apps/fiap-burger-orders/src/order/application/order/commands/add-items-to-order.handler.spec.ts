@@ -98,6 +98,9 @@ describe('AddItemsToOrderHandler', () => {
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
     expect(order.items.length).toBe(command.data.items.length);
-    expect(order.total).toEqual(command.data.items.length * itemPrice);
+    const expectedPrice = Number(
+      (itemPrice * command.data.items.length).toFixed(2),
+    );
+    expect(order.total).toEqual(expectedPrice);
   });
 });
