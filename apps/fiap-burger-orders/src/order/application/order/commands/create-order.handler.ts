@@ -19,12 +19,7 @@ export class CreateOrderHandler
     const { requester, items: itemsInput = [] } = command.data;
 
     const orderRequester = requester
-      ? new Requester(
-          requester.cpf ?? requester.email,
-          requester.name,
-          requester.cpf,
-          requester.email,
-        )
+      ? new Requester(requester.name, requester.cpf, requester.email)
       : null;
 
     const id = this.orderRepository.generateId();

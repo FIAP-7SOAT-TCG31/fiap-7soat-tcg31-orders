@@ -1,6 +1,5 @@
 export class Requester {
   constructor(
-    protected readonly _id: string,
     private readonly _name: string,
     private readonly _cpf?: string,
     private readonly _email?: string,

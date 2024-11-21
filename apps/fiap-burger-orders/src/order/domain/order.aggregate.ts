@@ -10,7 +10,7 @@ import { Requester } from './values/requester.value';
 export class Order extends AggregateRoot {
   constructor(
     protected readonly _id: string,
-    private readonly _requester: Requester,
+    private readonly _requester: Requester = null,
     private _status: OrderStatus = OrderStatus.initiate(),
     private _total: number = 0,
     private readonly _items: OrderItem[] = [],
@@ -31,9 +31,7 @@ export class Order extends AggregateRoot {
   }
 
   get items() {
-    return this._items.map((x) =>
-      Object.assign(Object.create(Item.prototype), x),
-    );
+    return this._items.map((x) => new OrderItem(x.key, x.name, x.price));
   }
 
   addItem(item: Item) {

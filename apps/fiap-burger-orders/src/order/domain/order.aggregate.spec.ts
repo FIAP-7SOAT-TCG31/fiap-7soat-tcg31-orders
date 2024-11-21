@@ -7,12 +7,7 @@ import { OrderItem } from './values/order-item.value';
 import { Requester } from './values/requester.value';
 
 const createSpiedTarget = () => {
-  const requester = new Requester(
-    randomUUID(),
-    'John Doe',
-    '01234567890',
-    'john@doe.com',
-  );
+  const requester = new Requester('John Doe', '01234567890', 'john@doe.com');
   const target = new Order(randomUUID(), requester);
 
   jest.spyOn(target as any, 'applyEvent');
