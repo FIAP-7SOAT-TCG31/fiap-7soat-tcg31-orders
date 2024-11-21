@@ -13,7 +13,7 @@ export class OrderItem {
   public readonly name: string;
 
   @ApiProperty()
-  public readonly price: string;
+  public readonly price: number;
 }
 
 export class Order {
@@ -31,4 +31,8 @@ export class Order {
 
   @ApiProperty({ type: OrderItem })
   public readonly items: OrderItem[];
+
+  constructor(values: Order) {
+    Object.assign(this, values);
+  }
 }

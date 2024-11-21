@@ -6,8 +6,13 @@ import { UpdateItemHandler } from './item/commands/update-item.handler';
 import { FindItemsHandler } from './item/queries/find-items.handler';
 import { GetItemByIdHandler } from './item/queries/get-item-by-id.handler';
 import { CreateOrderHandler } from './order/commands/create-order.handler';
+import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
 
-const QueryHandlers = [GetItemByIdHandler, FindItemsHandler];
+const QueryHandlers = [
+  GetItemByIdHandler,
+  FindItemsHandler,
+  GetOrderByIdHandler,
+];
 const CommandHandlers = [
   CreateItemHandler,
   UpdateItemHandler,
