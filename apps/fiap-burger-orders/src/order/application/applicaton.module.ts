@@ -5,9 +5,14 @@ import { CreateItemHandler } from './item/commands/create-item.handler';
 import { UpdateItemHandler } from './item/commands/update-item.handler';
 import { FindItemsHandler } from './item/queries/find-items.handler';
 import { GetItemByIdHandler } from './item/queries/get-item-by-id.handler';
+import { CreateOrderHandler } from './order/commands/create-order.handler';
 
 const QueryHandlers = [GetItemByIdHandler, FindItemsHandler];
-const CommandHandlers = [CreateItemHandler, UpdateItemHandler];
+const CommandHandlers = [
+  CreateItemHandler,
+  UpdateItemHandler,
+  CreateOrderHandler,
+];
 
 @Module({
   imports: [CqrsModule, InfraModule],

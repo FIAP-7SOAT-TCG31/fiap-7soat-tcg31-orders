@@ -33,6 +33,6 @@ export class CreateOrderHandler
 
     await this.orderRepository.create(order);
     await order.commit();
-    return new CreateOrderResult(order.id);
+    return new CreateOrderResult({ id });
   }
 }
