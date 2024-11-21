@@ -1,4 +1,4 @@
-import { AddItemsToOrderInput } from '../dtos/add-items-to-order.input.ts.js';
+import { AddItemsToOrderInput } from '../dtos/add-items-to-order.input';
 
 export class AddItemsToOrderCommand {
   constructor(public readonly data: AddItemsToOrderInput) {}
