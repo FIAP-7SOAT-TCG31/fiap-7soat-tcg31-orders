@@ -1,4 +1,3 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsOptional, IsString } from 'class-validator';
 import { OrderRequester } from './requester.dto';
 
@@ -14,13 +13,4 @@ export class CreateOrderInput {
 
   // This comes from the authentication token
   requester?: OrderRequester;
-}
-
-export class CreateOrderOutput {
-  @ApiProperty()
-  public readonly id: string;
-
-  constructor(id: string) {
-    this.id = id;
-  }
 }

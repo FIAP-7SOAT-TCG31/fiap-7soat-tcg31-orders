@@ -12,10 +12,8 @@ import {
   CreateOrderCommand,
   CreateOrderResult,
 } from '../../application/order/commands/create-order.command';
-import {
-  CreateOrderInput,
-  CreateOrderOutput,
-} from '../../application/order/dtos/create-order.input';
+import { CreateOrderInput } from '../../application/order/dtos/create-order.input';
+import { CreateOrderOutput } from '../../application/order/dtos/create-order.output';
 
 @ApiTags('Orders')
 @Controller({ version: '1', path: 'orders' })

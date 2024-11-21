@@ -85,9 +85,11 @@ describe('CheckoutOrderHandler', () => {
     jest.spyOn(orderRepository, 'findById').mockResolvedValue(order);
     jest.spyOn(orderRepository, 'update').mockResolvedValue();
     const command = new CheckoutOrderCommand('123');
-    await target.execute(command);
+    const result = await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
     expect(order.status).toBe(EOrderStatus.Requested);
     expect(order.paymentId).toBeDefined();
+    expect(order.qrCode).toBeDefined();
+    expect(result.data.qrCode).toBeDefined();
   });
 });

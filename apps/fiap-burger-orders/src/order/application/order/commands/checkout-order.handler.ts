@@ -3,15 +3,18 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { randomUUID } from 'crypto';
 import { OrderRepository } from '../abstractions/order.repository';
-import { CheckoutOrderCommand } from './checkout-order.command';
+import {
+  CheckoutOrderCommand,
+  CheckoutOrderResult,
+} from './checkout-order.command';
 
 @CommandHandler(CheckoutOrderCommand)
 export class CheckoutOrderHandler
-  implements ICommandHandler<CheckoutOrderCommand, void>
+  implements ICommandHandler<CheckoutOrderCommand, CheckoutOrderResult>
 {
   constructor(private readonly orderRepository: OrderRepository) {}
 
-  async execute({ id }: CheckoutOrderCommand): Promise<void> {
+  async execute({ id }: CheckoutOrderCommand): Promise<CheckoutOrderResult> {
     const order = await this.orderRepository.findById(id);
 
     if (!order) {
@@ -23,9 +26,12 @@ export class CheckoutOrderHandler
     }
 
     const paymentId = randomUUID();
-    order.checkout(paymentId);
+    const qrCode = randomUUID();
+    order.checkout(paymentId, qrCode);
 
     await this.orderRepository.update(order);
     await order.commit();
+
+    return new CheckoutOrderResult({ qrCode });
   }
 }
