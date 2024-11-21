@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Param, Put } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Patch } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
   ApiBadRequestResponse,
@@ -8,20 +8,20 @@ import {
   ApiTags,
   ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger';
-import { AddItemsToOrderCommand } from '../../application/order/commands/add-items-to-order.command';
-import { AddItemsToOrderInput } from '../../application/order/dtos/add-items-to-order.input';
+import { RemoveItemsFromOrderCommand } from '../../application/order/commands/remove-items-from-order.command';
+import { RemoveItemsFromOrderInput } from '../../application/order/dtos/remove-items-from-order.input';
 import { ObjectIdValidationPipe } from '../../infra/pipes/object-id-validation.pipe';
 
 @ApiTags('Orders')
 @Controller({ version: '1', path: 'orders' })
-export class AddItemsToOrderController {
+export class RemoveItemsFromOrderController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @Put(':id')
+  @Patch(':id')
   @HttpCode(204)
   @ApiOperation({
-    summary: 'Adds items to existing order',
-    description: 'Adds items to existing order',
+    summary: 'Removes items from an existing order',
+    description: 'Removes items from an existing order',
   })
   @ApiNoContentResponse()
   @ApiBadRequestResponse()
@@ -29,9 +29,9 @@ export class AddItemsToOrderController {
   @ApiInternalServerErrorResponse()
   async execute(
     @Param('id', new ObjectIdValidationPipe()) id: string,
-    @Body() data: AddItemsToOrderInput,
+    @Body() data: RemoveItemsFromOrderInput,
   ) {
     data.id = id;
-    await this.commandBus.execute(new AddItemsToOrderCommand(data));
+    await this.commandBus.execute(new RemoveItemsFromOrderCommand(data));
   }
 }

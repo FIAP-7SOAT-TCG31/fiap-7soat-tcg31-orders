@@ -18,7 +18,7 @@ describe('AddItemsToOrderController', () => {
     commandBus = app.get(CommandBus);
   });
 
-  it('should execute AddItemsorderCommand command', async () => {
+  it('should execute AddItemsToOrderCommand command', async () => {
     jest.spyOn(commandBus, 'execute').mockResolvedValue(null);
     const input = new AddItemsToOrderInput();
     input.items = [{ id: '123' }];

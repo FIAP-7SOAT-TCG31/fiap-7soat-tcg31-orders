@@ -76,6 +76,7 @@ export class Order extends AggregateRoot {
   }
 
   private calculatePrice(itemPrice: number) {
-    this._total = this._total + itemPrice;
+    const ensureFinancialAmount = (value: number) => Number(value.toFixed(2));
+    this._total = ensureFinancialAmount(this._total + itemPrice);
   }
 }
