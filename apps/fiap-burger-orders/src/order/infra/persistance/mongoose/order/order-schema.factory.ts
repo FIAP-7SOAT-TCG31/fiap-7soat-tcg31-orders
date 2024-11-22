@@ -26,6 +26,7 @@ export class MongooseOrderSchemaFactory
       total: entity.total,
       status: entity.status,
       paymentId: entity.paymentId,
+      qrCode: entity.qrCode,
     };
   }
 
@@ -43,6 +44,7 @@ export class MongooseOrderSchemaFactory
       entitySchema.total,
       entitySchema.items.map((x) => new OrderItem(x.key, x.name, x.price)),
       entitySchema.paymentId,
+      entitySchema.qrCode,
     );
   }
 }

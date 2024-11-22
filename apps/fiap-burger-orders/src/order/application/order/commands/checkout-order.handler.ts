@@ -1,8 +1,9 @@
 import { DomainException } from '@fiap-burger/tactical-design/core';
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { randomUUID } from 'crypto';
+import { EOrderStatus } from '../../../domain/values/order-status.value';
 import { OrderRepository } from '../abstractions/order.repository';
+import { PaymentService } from '../abstractions/payments.service';
 import {
   CheckoutOrderCommand,
   CheckoutOrderResult,
@@ -12,7 +13,10 @@ import {
 export class CheckoutOrderHandler
   implements ICommandHandler<CheckoutOrderCommand, CheckoutOrderResult>
 {
-  constructor(private readonly orderRepository: OrderRepository) {}
+  constructor(
+    private readonly orderRepository: OrderRepository,
+    private readonly paymentService: PaymentService,
+  ) {}
 
   async execute({ id }: CheckoutOrderCommand): Promise<CheckoutOrderResult> {
     const order = await this.orderRepository.findById(id);
@@ -25,8 +29,13 @@ export class CheckoutOrderHandler
       throw new DomainException('Order has no items');
     }
 
-    const paymentId = randomUUID();
-    const qrCode = randomUUID();
+    if (order.status !== EOrderStatus.Initiated) {
+      throw new DomainException(
+        'Cannot checkout order that is already in an advanced state',
+      );
+    }
+    const { id: paymentId, qrCode } =
+      await this.paymentService.createPixPayment(order.total);
     order.checkout(paymentId, qrCode);
 
     await this.orderRepository.update(order);

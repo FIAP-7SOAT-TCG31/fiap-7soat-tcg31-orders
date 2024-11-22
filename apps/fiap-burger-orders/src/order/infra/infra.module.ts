@@ -1,7 +1,10 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ItemRepository } from '../application/item/abstractions/item.repository';
 import { OrderRepository } from '../application/order/abstractions/order.repository';
+import { PaymentService } from '../application/order/abstractions/payments.service';
+import { FiapBurgerPaymentService } from './external-services/fiap-burger-payments.service';
 import { MongooseItemSchemaFactory } from './persistance/mongoose/item/item-schema.factory';
 import { MongooseItemRepository } from './persistance/mongoose/item/item.repository';
 import {
@@ -29,7 +32,7 @@ const MongooseSchemaModule = MongooseModule.forFeature([
 MongooseSchemaModule.global = true;
 
 @Module({
-  imports: [MongooseSchemaModule],
+  imports: [HttpModule.register({}), MongooseSchemaModule],
   providers: [
     MongooseItemSchemaFactory,
     {
@@ -41,7 +44,11 @@ MongooseSchemaModule.global = true;
       provide: OrderRepository,
       useClass: MongooseOrderRepository,
     },
+    {
+      provide: PaymentService,
+      useClass: FiapBurgerPaymentService,
+    },
   ],
-  exports: [ItemRepository, OrderRepository],
+  exports: [ItemRepository, OrderRepository, PaymentService],
 })
 export class InfraModule {}

@@ -1,7 +1,7 @@
 import { CommandBus, CqrsModule } from '@nestjs/cqrs';
 import { Test, TestingModule } from '@nestjs/testing';
+import { randomUUID } from 'crypto';
 import { CheckoutOrderCommand } from '../../application/order/commands/checkout-order.command';
-import { CheckoutOrderOutput } from '../../application/order/dtos/checkout-order.output';
 import { CheckoutOrderController } from './checkout-order.controller';
 
 describe('CheckoutOrderController', () => {
@@ -19,14 +19,15 @@ describe('CheckoutOrderController', () => {
   });
 
   it('should execute CheckoutOrder command', async () => {
-    jest.spyOn(commandBus, 'execute').mockResolvedValue(null);
+    jest
+      .spyOn(commandBus, 'execute')
+      .mockResolvedValue({ data: { qrCode: randomUUID() } });
     const id = '123';
     const result = await target.execute(id);
     expect(commandBus.execute).toHaveBeenCalledWith(
       new CheckoutOrderCommand(id),
     );
-    expect(result).toBeInstanceOf(CheckoutOrderOutput);
-    expect(result.qrCode).toBeInstanceOf(CheckoutOrderOutput);
+    expect(result.qrCode).toBeDefined();
   });
 
   it('should throw if commandBus throws', async () => {

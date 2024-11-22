@@ -32,6 +32,12 @@ export class Order {
   @ApiProperty({ type: OrderItem })
   public readonly items: OrderItem[];
 
+  @ApiPropertyOptional()
+  public readonly paymentId?: string;
+
+  @ApiPropertyOptional()
+  public readonly qrCode?: string;
+
   constructor(values: Order) {
     Object.assign(this, values);
   }

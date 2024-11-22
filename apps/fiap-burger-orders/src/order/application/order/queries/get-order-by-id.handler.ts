@@ -27,6 +27,8 @@ export class GetOrderByIdHandler
         id: result._id.toHexString(),
         status: result.status,
         total: result.total,
+        paymentId: result.paymentId,
+        qrCode: result.qrCode,
         requester: result.requester
           ? {
               name: result.requester.name,
