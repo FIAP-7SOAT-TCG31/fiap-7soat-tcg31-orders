@@ -1,17 +1,43 @@
 import { Injectable } from '@nestjs/common';
+import { IsDateString, IsNumber, IsObject, IsString } from 'class-validator';
 import { Entity } from './entity';
 
 export abstract class DomainEvent /* NOSONAR */ {}
 
 export class AggregateEvent<T extends DomainEvent = DomainEvent> {
+  @IsString()
+  public readonly id: string;
+
+  @IsString()
+  public readonly aggregateId: string;
+
+  @IsString()
+  public readonly eventName: string;
+
+  @IsDateString()
+  public readonly timestamp: Date;
+
+  @IsNumber()
+  public readonly version: number;
+
+  @IsObject()
+  public readonly data: T;
+
   constructor(
-    public readonly id: string,
-    public readonly aggregateId: string,
-    public readonly eventName: string,
-    public readonly timestamp: Date,
-    public readonly version: number,
-    public readonly data: T,
-  ) {}
+    id: string,
+    aggregateId: string,
+    eventName: string,
+    timestamp: Date,
+    version: number,
+    data: T,
+  ) {
+    this.id = id;
+    this.aggregateId = aggregateId;
+    this.eventName = eventName;
+    this.timestamp = timestamp;
+    this.version = version;
+    this.data = data;
+  }
 }
 
 export interface AggregateContext {
