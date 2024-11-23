@@ -2,18 +2,21 @@ import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { OrderRepository } from '../abstractions/order.repository';
 import { PreparationService } from '../abstractions/preparation.service';
-import { RequestOrderPreparationCommand } from './request-order-preparation.command';
+import { RequestOrderPreparationOnPaymentApprovedCommand } from './request-order-preparation-on-payment-approved.command';
 
-@CommandHandler(RequestOrderPreparationCommand)
-export class RequestOrderPreparationHandler
-  implements ICommandHandler<RequestOrderPreparationCommand, void>
+@CommandHandler(RequestOrderPreparationOnPaymentApprovedCommand)
+export class RequestOrderPreparationOnPaymentApprovedHandler
+  implements
+    ICommandHandler<RequestOrderPreparationOnPaymentApprovedCommand, void>
 {
   constructor(
     private readonly orderRepository: OrderRepository,
     private readonly preparationService: PreparationService,
   ) {}
 
-  async execute(command: RequestOrderPreparationCommand): Promise<void> {
+  async execute(
+    command: RequestOrderPreparationOnPaymentApprovedCommand,
+  ): Promise<void> {
     const { paymentId } = command;
 
     const order = await this.orderRepository.findByPaymentId(paymentId);

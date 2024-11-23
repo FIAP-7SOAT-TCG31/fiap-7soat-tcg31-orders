@@ -3,7 +3,7 @@ import { routingKeyOfEvent } from '@fiap-burger/tactical-design/amqp';
 import { Body, Injectable } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import { withPrefix } from '../../../config/amqp.config';
-import { RequestOrderPreparationCommand } from '../../application/order/commands/request-order-preparation.command';
+import { RequestOrderPreparationOnPaymentApprovedCommand } from '../../application/order/commands/request-order-preparation-on-payment-approved.command';
 import { PaymentApproved } from '../../application/order/dtos/payment-approved.integration-event';
 
 @Injectable()
@@ -13,7 +13,7 @@ export class OnPaymentApprovedRequestPreparationController {
   @AmqpSubscription({
     exchange: 'fiap.burger.payments.events',
     routingKey: routingKeyOfEvent(PaymentApproved),
-    queue: withPrefix(RequestOrderPreparationCommand.name),
+    queue: withPrefix(RequestOrderPreparationOnPaymentApprovedCommand.name),
   })
   @AmqpRetrialPolicy({
     delay: 5000,
@@ -23,7 +23,7 @@ export class OnPaymentApprovedRequestPreparationController {
   async execute(@Body() data: PaymentApproved) {
     const paymentId = data.aggregateId;
     await this.commandBus.execute(
-      new RequestOrderPreparationCommand(paymentId),
+      new RequestOrderPreparationOnPaymentApprovedCommand(paymentId),
     );
   }
 }

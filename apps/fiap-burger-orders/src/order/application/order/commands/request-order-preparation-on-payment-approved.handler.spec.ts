@@ -12,12 +12,12 @@ import { OrderStatus } from '../../../domain/values/order-status.value';
 import { FiapBurgerPreparationService } from '../../../infra/external-services/fiap-burger-preparation.service';
 import { OrderRepository } from '../abstractions/order.repository';
 import { PreparationService } from '../abstractions/preparation.service';
-import { RequestOrderPreparationCommand } from './request-order-preparation.command';
-import { RequestOrderPreparationHandler } from './request-order-preparation.handler';
+import { RequestOrderPreparationOnPaymentApprovedCommand } from './request-order-preparation-on-payment-approved.command';
+import { RequestOrderPreparationOnPaymentApprovedHandler } from './request-order-preparation-on-payment-approved.handler';
 
-describe('RequestOrderPreparationHandler', () => {
+describe('RequestOrderPreparationOnPaymentApprovedHandler', () => {
   let app: INestApplication;
-  let target: RequestOrderPreparationHandler;
+  let target: RequestOrderPreparationOnPaymentApprovedHandler;
   let orderRepository: OrderRepository;
   let preparationService: PreparationService;
 
@@ -38,7 +38,7 @@ describe('RequestOrderPreparationHandler', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        RequestOrderPreparationHandler,
+        RequestOrderPreparationOnPaymentApprovedHandler,
         {
           provide: TransactionManager,
           useClass: FakeTransactionManager,
@@ -55,7 +55,7 @@ describe('RequestOrderPreparationHandler', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    target = app.get(RequestOrderPreparationHandler);
+    target = app.get(RequestOrderPreparationOnPaymentApprovedHandler);
     orderRepository = app.get(OrderRepository);
     preparationService = app.get(PreparationService);
 
@@ -65,7 +65,7 @@ describe('RequestOrderPreparationHandler', () => {
   it('should throw NotFoundException when Order does not exist', async () => {
     jest.spyOn(orderRepository, 'findByPaymentId').mockResolvedValue(null);
     jest.spyOn(orderRepository, 'update');
-    const command = new RequestOrderPreparationCommand('123');
+    const command = new RequestOrderPreparationOnPaymentApprovedCommand('123');
     await expect(() => target.execute(command)).rejects.toThrow(
       NotFoundException,
     );
@@ -82,7 +82,9 @@ describe('RequestOrderPreparationHandler', () => {
     jest
       .spyOn(preparationService, 'requestPreparation')
       .mockResolvedValue({ conciliationId });
-    const command = new RequestOrderPreparationCommand(order.paymentId);
+    const command = new RequestOrderPreparationOnPaymentApprovedCommand(
+      order.paymentId,
+    );
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
     expect(order.preparationId).toBe(conciliationId);
