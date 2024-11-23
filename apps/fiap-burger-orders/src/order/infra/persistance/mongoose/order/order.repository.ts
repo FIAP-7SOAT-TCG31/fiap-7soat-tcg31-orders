@@ -33,4 +33,8 @@ export class MongooseOrderRepository
   async findByPaymentId(paymentId: string): Promise<Order> {
     return this.findOne({ paymentId });
   }
+
+  async findByPreparationId(preparationId: string): Promise<Order> {
+    return this.findOne({ preparationId });
+  }
 }

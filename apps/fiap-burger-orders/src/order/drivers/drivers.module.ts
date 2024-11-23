@@ -12,6 +12,7 @@ import { FindOrdersController } from './order/find-orders.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
 import { OnPaymentApprovedRequestPreparationController } from './order/on-payment-approved-request-prepration.controller';
 import { OnPaymentRejectedRejectOrderController } from './order/on-payment-rejected-reject-order.controller';
+import { OnPreparationCompletedCompleteOrderController } from './order/on-preparation-completed-complete-order.controller';
 import { RemoveItemsFromOrderController } from './order/remove-items-from-order.controller';
 
 const HttpDrivers = [
@@ -29,6 +30,7 @@ const HttpDrivers = [
 const AmqpDrivers = [
   OnPaymentApprovedRequestPreparationController,
   OnPaymentRejectedRejectOrderController,
+  OnPreparationCompletedCompleteOrderController,
 ];
 
 @Module({

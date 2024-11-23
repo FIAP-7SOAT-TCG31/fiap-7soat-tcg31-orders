@@ -2,6 +2,7 @@ import { AggregateRoot } from '@fiap-burger/tactical-design/core';
 import { ItemAdded } from './events/item-added.event';
 import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
+import { OrderCompleted } from './events/order-completed.event';
 import { OrderCreated } from './events/order-created.event';
 import { OrderRejected } from './events/order-rejected.event';
 import { PreparationRequested } from './events/preparation-requested.event';
@@ -82,6 +83,14 @@ export class Order extends AggregateRoot {
   onOrderRejected(event: OrderRejected) {
     this._status = this._status.rejectPayment();
     this._rejectionReason = event.reason;
+  }
+
+  complete() {
+    this.apply(new OrderCompleted());
+  }
+
+  onOrderCompleted() {
+    this._status = this._status.complete();
   }
 
   addItem(item: Item) {
