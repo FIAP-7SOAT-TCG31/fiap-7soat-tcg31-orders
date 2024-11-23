@@ -9,6 +9,7 @@ import { AddItemsToOrderHandler } from './order/commands/add-items-to-order.hand
 import { CheckoutOrderHandler } from './order/commands/checkout-order.handler';
 import { CreateOrderHandler } from './order/commands/create-order.handler';
 import { RemoveItemsFromOrderHandler } from './order/commands/remove-items-from-order.handler';
+import { RequestOrderPreparationHandler } from './order/commands/request-order-preparation.handler';
 import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
 
 const QueryHandlers = [
@@ -23,6 +24,7 @@ const CommandHandlers = [
   AddItemsToOrderHandler,
   RemoveItemsFromOrderHandler,
   CheckoutOrderHandler,
+  RequestOrderPreparationHandler,
 ];
 
 @Module({

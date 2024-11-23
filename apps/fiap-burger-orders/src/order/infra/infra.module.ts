@@ -4,7 +4,9 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ItemRepository } from '../application/item/abstractions/item.repository';
 import { OrderRepository } from '../application/order/abstractions/order.repository';
 import { PaymentService } from '../application/order/abstractions/payments.service';
+import { PreparationService } from '../application/order/abstractions/preparation.service';
 import { FiapBurgerPaymentService } from './external-services/fiap-burger-payments.service';
+import { FiapBurgerPreparationService } from './external-services/fiap-burger-preparation.service';
 import { MongooseItemSchemaFactory } from './persistance/mongoose/item/item-schema.factory';
 import { MongooseItemRepository } from './persistance/mongoose/item/item.repository';
 import {
@@ -48,7 +50,16 @@ MongooseSchemaModule.global = true;
       provide: PaymentService,
       useClass: FiapBurgerPaymentService,
     },
+    {
+      provide: PreparationService,
+      useClass: FiapBurgerPreparationService,
+    },
   ],
-  exports: [ItemRepository, OrderRepository, PaymentService],
+  exports: [
+    ItemRepository,
+    OrderRepository,
+    PaymentService,
+    PreparationService,
+  ],
 })
 export class InfraModule {}

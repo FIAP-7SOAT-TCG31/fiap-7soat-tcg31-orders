@@ -9,6 +9,7 @@ import { AddItemsToOrderController } from './order/add-items-to-order.controller
 import { CheckoutOrderController } from './order/checkout-order.controller';
 import { CreateOrderController } from './order/create-order.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
+import { OnPaymentApprovedRequestPreparationController } from './order/on-payment-approved-request-prepration.controller';
 import { RemoveItemsFromOrderController } from './order/remove-items-from-order.controller';
 
 const HttpDrivers = [
@@ -22,7 +23,7 @@ const HttpDrivers = [
   RemoveItemsFromOrderController,
   CheckoutOrderController,
 ];
-const AmqpDrivers = [];
+const AmqpDrivers = [OnPaymentApprovedRequestPreparationController];
 
 @Module({
   imports: [CqrsModule, ApplicationModule],

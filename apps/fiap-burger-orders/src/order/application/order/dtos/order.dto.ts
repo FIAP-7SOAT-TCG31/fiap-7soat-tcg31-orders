@@ -38,6 +38,9 @@ export class Order {
   @ApiPropertyOptional()
   public readonly qrCode?: string;
 
+  @ApiPropertyOptional()
+  public readonly preparationId?: string;
+
   constructor(values: Order) {
     Object.assign(this, values);
   }

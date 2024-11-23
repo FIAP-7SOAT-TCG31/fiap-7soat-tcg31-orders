@@ -2,6 +2,7 @@ import { AggregateRoot } from '@fiap-burger/tactical-design/core';
 import { ItemAdded } from './events/item-added.event';
 import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
+import { PreparationRequested } from './events/preparation-requested.event';
 import { Item } from './item.entity';
 import { OrderItem } from './values/order-item.value';
 import { EOrderStatus, OrderStatus } from './values/order-status.value';
@@ -16,6 +17,7 @@ export class Order extends AggregateRoot {
     private readonly _items: OrderItem[] = [],
     private _paymentId: string = null,
     private _qrCode: string = null,
+    private _preparationId: string = null,
   ) {
     super(_id);
   }
@@ -42,6 +44,19 @@ export class Order extends AggregateRoot {
 
   get qrCode() {
     return this._qrCode;
+  }
+
+  get preparationId() {
+    return this._preparationId;
+  }
+
+  requestPreparation(preparationId: string) {
+    this.apply(new PreparationRequested(preparationId));
+  }
+
+  onPreparationRequested(event: PreparationRequested) {
+    this._status = this._status.complete();
+    this._preparationId = event.preparationId;
   }
 
   addItem(item: Item) {

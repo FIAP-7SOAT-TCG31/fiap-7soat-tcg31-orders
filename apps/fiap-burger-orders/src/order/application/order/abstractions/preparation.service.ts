@@ -1,6 +1,8 @@
+import { OrderItem } from '../../../domain/values/order-item.value';
+
 export abstract class PreparationService {
   abstract requestPreparation(
     orderId: string,
-    items: string[],
+    items: OrderItem[],
   ): Promise<{ conciliationId: string }>;
 }

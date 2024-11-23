@@ -7,4 +7,5 @@ export abstract class OrderRepository implements Repository<Order> {
   abstract findById(id: string): Promise<Order>;
   abstract findAll(): Promise<Order[]>;
   abstract generateId(): string;
+  abstract findByPaymentId(paymentId: string): Promise<Order>;
 }

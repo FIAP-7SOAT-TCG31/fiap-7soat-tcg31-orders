@@ -29,6 +29,7 @@ export class GetOrderByIdHandler
         total: result.total,
         paymentId: result.paymentId,
         qrCode: result.qrCode,
+        preparationId: result.preparationId,
         requester: result.requester
           ? {
               name: result.requester.name,

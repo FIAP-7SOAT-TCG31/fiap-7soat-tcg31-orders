@@ -45,6 +45,9 @@ export class MongooseOrderSchema extends MongooseEntitySchema {
 
   @Prop()
   qrCode?: string;
+
+  @Prop()
+  preparationId?: string;
 }
 
 export const MongooseOrderSchemaModel =

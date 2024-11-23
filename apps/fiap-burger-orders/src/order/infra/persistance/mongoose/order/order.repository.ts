@@ -29,4 +29,8 @@ export class MongooseOrderRepository
   generateId(): string {
     return new Types.ObjectId().toHexString();
   }
+
+  async findByPaymentId(paymentId: string): Promise<Order> {
+    return this.findOne({ paymentId });
+  }
 }
