@@ -1,25 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsObject, IsString } from 'class-validator';
 import { Entity } from './entity';
 
 export abstract class DomainEvent /* NOSONAR */ {}
 
 export class AggregateEvent<T extends DomainEvent = DomainEvent> {
+  @ApiProperty()
   @IsString()
   public readonly id: string;
 
+  @ApiProperty()
   @IsString()
   public readonly aggregateId: string;
 
+  @ApiProperty()
   @IsString()
   public readonly eventName: string;
 
+  @ApiProperty()
   @IsDateString()
   public readonly timestamp: Date;
 
+  @ApiProperty()
   @IsNumber()
   public readonly version: number;
 
+  @ApiProperty({ description: 'The internal domain event structure' })
   @IsObject()
   public readonly data: T;
 
