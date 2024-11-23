@@ -8,6 +8,7 @@ import { UpdateItemController } from './item/update-item.controller';
 import { AddItemsToOrderController } from './order/add-items-to-order.controller';
 import { CheckoutOrderController } from './order/checkout-order.controller';
 import { CreateOrderController } from './order/create-order.controller';
+import { FindOrdersController } from './order/find-orders.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
 import { OnPaymentApprovedRequestPreparationController } from './order/on-payment-approved-request-prepration.controller';
 import { OnPaymentRejectedRejectOrderController } from './order/on-payment-rejected-reject-order.controller';
@@ -20,6 +21,7 @@ const HttpDrivers = [
   FindItemsController,
   CreateOrderController,
   GetOrderByIdController,
+  FindOrdersController,
   AddItemsToOrderController,
   RemoveItemsFromOrderController,
   CheckoutOrderController,

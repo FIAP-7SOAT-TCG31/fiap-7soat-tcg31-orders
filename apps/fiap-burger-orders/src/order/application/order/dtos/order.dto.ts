@@ -44,6 +44,12 @@ export class Order {
   @ApiPropertyOptional()
   public readonly rejectionReason?: string;
 
+  @ApiProperty()
+  public readonly createdAt: Date;
+
+  @ApiPropertyOptional()
+  public readonly updatedAt?: Date;
+
   constructor(values: Order) {
     Object.assign(this, values);
   }

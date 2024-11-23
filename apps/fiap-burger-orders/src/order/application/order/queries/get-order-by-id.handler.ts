@@ -43,6 +43,8 @@ export class GetOrderByIdHandler
           name,
           price,
         })),
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
       }),
     );
   }
