@@ -8,18 +8,16 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { randomUUID } from 'crypto';
 import { Item } from '../../../domain/item.entity';
 import { Order } from '../../../domain/order.aggregate';
+import { EOrderRejectionReason } from '../../../domain/values/order-rejection-reason.value';
 import { OrderStatus } from '../../../domain/values/order-status.value';
-import { FiapBurgerPreparationService } from '../../../infra/external-services/fiap-burger-preparation.service';
 import { OrderRepository } from '../abstractions/order.repository';
-import { PreparationService } from '../abstractions/preparation.service';
-import { RequestOrderPreparationOnPaymentApprovedCommand } from './request-order-preparation-on-payment-approved.command';
-import { RequestOrderPreparationOnPaymentApprovedHandler } from './request-order-preparation-on-payment-approved.handler';
+import { RejectOrderOnPaymentRejectedCommand } from './reject-order-on-payment-rejected.command';
+import { RejectOrderOnPaymentRejectedHandler } from './reject-order-on-payment-rejected.handler';
 
-describe('RequestOrderPreparationOnPaymentApprovedHandler', () => {
+describe('RejectOrderOnPaymentRejectedHandler', () => {
   let app: INestApplication;
-  let target: RequestOrderPreparationOnPaymentApprovedHandler;
+  let target: RejectOrderOnPaymentRejectedHandler;
   let orderRepository: OrderRepository;
-  let preparationService: PreparationService;
 
   const itemPrice = 19.9;
   const createItem = (id: string = randomUUID()) =>
@@ -38,7 +36,7 @@ describe('RequestOrderPreparationOnPaymentApprovedHandler', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        RequestOrderPreparationOnPaymentApprovedHandler,
+        RejectOrderOnPaymentRejectedHandler,
         {
           provide: TransactionManager,
           useClass: FakeTransactionManager,
@@ -47,17 +45,12 @@ describe('RequestOrderPreparationOnPaymentApprovedHandler', () => {
           provide: OrderRepository,
           useClass: FakeRepository,
         },
-        {
-          provide: PreparationService,
-          useValue: Object.create(FiapBurgerPreparationService.prototype),
-        },
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    target = app.get(RequestOrderPreparationOnPaymentApprovedHandler);
+    target = app.get(RejectOrderOnPaymentRejectedHandler);
     orderRepository = app.get(OrderRepository);
-    preparationService = app.get(PreparationService);
 
     orderRepository.findByPaymentId = jest.fn();
   });
@@ -65,28 +58,22 @@ describe('RequestOrderPreparationOnPaymentApprovedHandler', () => {
   it('should throw NotFoundException when Order does not exist', async () => {
     jest.spyOn(orderRepository, 'findByPaymentId').mockResolvedValue(null);
     jest.spyOn(orderRepository, 'update');
-    const command = new RequestOrderPreparationOnPaymentApprovedCommand('123');
+    const command = new RejectOrderOnPaymentRejectedCommand('123');
     await expect(() => target.execute(command)).rejects.toThrow(
       NotFoundException,
     );
     expect(orderRepository.update).not.toHaveBeenCalled();
   });
 
-  it('should request order preparation on external service', async () => {
-    const conciliationId = '123';
+  it('should reject order when on payment rejected', async () => {
     const order = new Order(randomUUID(), null, OrderStatus.initiate());
     order.addItem(createItem());
     order.checkout(randomUUID(), randomUUID());
     jest.spyOn(orderRepository, 'findByPaymentId').mockResolvedValue(order);
     jest.spyOn(orderRepository, 'update').mockResolvedValue();
-    jest
-      .spyOn(preparationService, 'requestPreparation')
-      .mockResolvedValue({ conciliationId });
-    const command = new RequestOrderPreparationOnPaymentApprovedCommand(
-      order.paymentId,
-    );
+    const command = new RejectOrderOnPaymentRejectedCommand(order.paymentId);
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
-    expect(order.preparationId).toBe(conciliationId);
+    expect(order.rejectionReason).toBe(EOrderRejectionReason.PaymentRejected);
   });
 });

@@ -2,9 +2,11 @@ import { AggregateRoot } from '@fiap-burger/tactical-design/core';
 import { ItemAdded } from './events/item-added.event';
 import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
+import { OrderRejected } from './events/order-rejected.event';
 import { PreparationRequested } from './events/preparation-requested.event';
 import { Item } from './item.entity';
 import { OrderItem } from './values/order-item.value';
+import { OrderRejectionReason } from './values/order-rejection-reason.value';
 import { EOrderStatus, OrderStatus } from './values/order-status.value';
 import { Requester } from './values/requester.value';
 
@@ -18,6 +20,7 @@ export class Order extends AggregateRoot {
     private _paymentId: string = null,
     private _qrCode: string = null,
     private _preparationId: string = null,
+    private _rejectionReason: string = null,
   ) {
     super(_id);
   }
@@ -50,6 +53,10 @@ export class Order extends AggregateRoot {
     return this._preparationId;
   }
 
+  get rejectionReason() {
+    return this._rejectionReason;
+  }
+
   requestPreparation(preparationId: string) {
     this.apply(new PreparationRequested(preparationId));
   }
@@ -57,6 +64,15 @@ export class Order extends AggregateRoot {
   onPreparationRequested(event: PreparationRequested) {
     this._status = this._status.complete();
     this._preparationId = event.preparationId;
+  }
+
+  reject(reason: OrderRejectionReason) {
+    this.apply(new OrderRejected(reason));
+  }
+
+  onOrderRejected(event: OrderRejected) {
+    this._status = this._status.reject();
+    this._rejectionReason = event.reason;
   }
 
   addItem(item: Item) {

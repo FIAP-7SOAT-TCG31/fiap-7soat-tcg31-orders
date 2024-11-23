@@ -41,6 +41,9 @@ export class Order {
   @ApiPropertyOptional()
   public readonly preparationId?: string;
 
+  @ApiPropertyOptional()
+  public readonly rejectionReason?: string;
+
   constructor(values: Order) {
     Object.assign(this, values);
   }

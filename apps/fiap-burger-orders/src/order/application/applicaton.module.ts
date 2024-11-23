@@ -8,6 +8,7 @@ import { GetItemByIdHandler } from './item/queries/get-item-by-id.handler';
 import { AddItemsToOrderHandler } from './order/commands/add-items-to-order.handler';
 import { CheckoutOrderHandler } from './order/commands/checkout-order.handler';
 import { CreateOrderHandler } from './order/commands/create-order.handler';
+import { RejectOrderOnPaymentRejectedHandler } from './order/commands/reject-order-on-payment-rejected.handler';
 import { RemoveItemsFromOrderHandler } from './order/commands/remove-items-from-order.handler';
 import { RequestOrderPreparationOnPaymentApprovedHandler } from './order/commands/request-order-preparation-on-payment-approved.handler';
 import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
@@ -25,6 +26,7 @@ const CommandHandlers = [
   RemoveItemsFromOrderHandler,
   CheckoutOrderHandler,
   RequestOrderPreparationOnPaymentApprovedHandler,
+  RejectOrderOnPaymentRejectedHandler,
 ];
 
 @Module({

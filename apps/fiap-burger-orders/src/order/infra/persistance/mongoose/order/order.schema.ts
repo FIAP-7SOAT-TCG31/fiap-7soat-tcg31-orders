@@ -48,6 +48,9 @@ export class MongooseOrderSchema extends MongooseEntitySchema {
 
   @Prop()
   preparationId?: string;
+
+  @Prop()
+  rejectionReason?: string;
 }
 
 export const MongooseOrderSchemaModel =

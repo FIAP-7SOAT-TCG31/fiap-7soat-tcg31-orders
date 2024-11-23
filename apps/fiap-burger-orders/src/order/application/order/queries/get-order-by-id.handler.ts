@@ -30,6 +30,7 @@ export class GetOrderByIdHandler
         paymentId: result.paymentId,
         qrCode: result.qrCode,
         preparationId: result.preparationId,
+        rejectionReason: result.rejectionReason,
         requester: result.requester
           ? {
               name: result.requester.name,
