@@ -130,7 +130,7 @@ describe('CheckoutOrderHandler', () => {
     const command = new CheckoutOrderCommand('123');
     const result = await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
-    expect(order.status).toBe(EOrderStatus.Requested);
+    expect(order.status).toBe(EOrderStatus.PaymentRequested);
     expect(order.paymentId).toBe(payment.id);
     expect(order.qrCode).toBe(payment.qrCode);
     expect(result.data.qrCode).toBe(payment.qrCode);

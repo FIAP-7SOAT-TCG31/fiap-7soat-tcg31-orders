@@ -24,6 +24,7 @@ export class CreateOrderHandler
 
     const id = this.orderRepository.generateId();
     const order = new Order(id, orderRequester, OrderStatus.initiate());
+    order.create();
 
     const items = await Promise.all(
       itemsInput.map((x) => this.itemsRepository.findById(x.id)),

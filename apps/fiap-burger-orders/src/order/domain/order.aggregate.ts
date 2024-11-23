@@ -2,6 +2,7 @@ import { AggregateRoot } from '@fiap-burger/tactical-design/core';
 import { ItemAdded } from './events/item-added.event';
 import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
+import { OrderCreated } from './events/order-created.event';
 import { OrderRejected } from './events/order-rejected.event';
 import { PreparationRequested } from './events/preparation-requested.event';
 import { Item } from './item.entity';
@@ -57,12 +58,20 @@ export class Order extends AggregateRoot {
     return this._rejectionReason;
   }
 
+  create() {
+    this.apply(new OrderCreated());
+  }
+
+  onOrderCreated() {
+    this._status = OrderStatus.initiate();
+  }
+
   requestPreparation(preparationId: string) {
     this.apply(new PreparationRequested(preparationId));
   }
 
   onPreparationRequested(event: PreparationRequested) {
-    this._status = this._status.complete();
+    this._status = this._status.requestPreparation();
     this._preparationId = event.preparationId;
   }
 
@@ -71,7 +80,7 @@ export class Order extends AggregateRoot {
   }
 
   onOrderRejected(event: OrderRejected) {
-    this._status = this._status.reject();
+    this._status = this._status.rejectPayment();
     this._rejectionReason = event.reason;
   }
 
@@ -80,13 +89,12 @@ export class Order extends AggregateRoot {
     if (status !== EOrderStatus.Initiated) {
       throw new Error(`Cannot add item, order is already at status ${status}`);
     }
-    this.apply(new ItemAdded(item));
+    this.apply(new ItemAdded(OrderItem.fromItem(item)));
   }
 
   onItemAdded({ item }: ItemAdded) {
-    const orderItem = OrderItem.fromItem(item);
-    this._items.push(orderItem);
-    this.calculatePrice(orderItem.price);
+    this._items.push(item);
+    this.calculatePrice(item.price);
   }
 
   removeItem(item: OrderItem) {
@@ -113,7 +121,7 @@ export class Order extends AggregateRoot {
   }
 
   onOrderCheckedOut(event: OrderCheckedOut) {
-    this._status = this._status.request();
+    this._status = this._status.requestPayment();
     this._paymentId = event.paymentId;
     this._qrCode = event.qrCode;
   }

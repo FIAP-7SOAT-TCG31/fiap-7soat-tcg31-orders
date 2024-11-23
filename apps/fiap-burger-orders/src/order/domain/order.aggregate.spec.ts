@@ -23,14 +23,17 @@ describe('Order', () => {
     const target = createSpiedTarget();
     const item = new Item('1', 'XBurger', 12.99, 'Dessert', 'desc');
     target.addItem(item);
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { key, ...rest } = OrderItem.fromItem(item);
-    expect(target.total).toBe(12.99);
-    expect(target.items).toEqual(
-      expect.arrayContaining([expect.objectContaining(rest)]),
+    const orderItem = OrderItem.fromItem(item);
+    const [itemOnOrder] = target.items;
+    const expectedOrderItem = new OrderItem(
+      itemOnOrder.key,
+      orderItem.name,
+      orderItem.price,
     );
+    expect(target.total).toBe(12.99);
+    expect(target.items).toEqual(expect.arrayContaining([expectedOrderItem]));
     expect((target as any).applyEvent).toHaveBeenCalledWith(
-      new ItemAdded(item),
+      new ItemAdded(expectedOrderItem),
     );
   });
 

@@ -6,10 +6,11 @@ import {
 } from './order-status.value';
 
 const AllStatuses: OrderStatusValues[] = [
-  'Initiated',
-  'Requested',
-  'Rejected',
-  'Completed',
+  EOrderStatus.Initiated,
+  EOrderStatus.PaymentRequested,
+  EOrderStatus.PreparationRequested,
+  EOrderStatus.PaymentRejected,
+  EOrderStatus.Completed,
 ];
 
 describe('OrderStatus', () => {
@@ -32,31 +33,46 @@ describe('OrderStatus', () => {
   describe.each([
     [EOrderStatus.Initiated, EOrderStatus.Initiated, false],
     [EOrderStatus.Initiated, EOrderStatus.Completed, false],
-    [EOrderStatus.Initiated, EOrderStatus.Rejected, false],
-    [EOrderStatus.Initiated, EOrderStatus.Requested, true],
+    [EOrderStatus.Initiated, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.Initiated, EOrderStatus.PreparationRequested, false],
+    [EOrderStatus.Initiated, EOrderStatus.PaymentRequested, true],
 
-    [EOrderStatus.Requested, EOrderStatus.Initiated, false],
-    [EOrderStatus.Requested, EOrderStatus.Completed, true],
-    [EOrderStatus.Requested, EOrderStatus.Rejected, true],
-    [EOrderStatus.Requested, EOrderStatus.Requested, false],
+    [EOrderStatus.PaymentRequested, EOrderStatus.Initiated, false],
+    [EOrderStatus.PaymentRequested, EOrderStatus.Completed, false],
+    [EOrderStatus.PaymentRequested, EOrderStatus.PaymentRejected, true],
+    [EOrderStatus.PaymentRequested, EOrderStatus.PaymentRequested, false],
+    [EOrderStatus.PaymentRequested, EOrderStatus.PreparationRequested, true],
+
+    [EOrderStatus.PreparationRequested, EOrderStatus.Initiated, false],
+    [
+      EOrderStatus.PreparationRequested,
+      EOrderStatus.PreparationRequested,
+      false,
+    ],
+    [EOrderStatus.PreparationRequested, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.PreparationRequested, EOrderStatus.PaymentRequested, false],
+    [EOrderStatus.PreparationRequested, EOrderStatus.Completed, true],
 
     [EOrderStatus.Completed, EOrderStatus.Initiated, false],
     [EOrderStatus.Completed, EOrderStatus.Completed, false],
-    [EOrderStatus.Completed, EOrderStatus.Rejected, false],
-    [EOrderStatus.Completed, EOrderStatus.Requested, false],
+    [EOrderStatus.Completed, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.Completed, EOrderStatus.PreparationRequested, false],
+    [EOrderStatus.Completed, EOrderStatus.PaymentRequested, false],
 
-    [EOrderStatus.Rejected, EOrderStatus.Initiated, false],
-    [EOrderStatus.Rejected, EOrderStatus.Completed, false],
-    [EOrderStatus.Rejected, EOrderStatus.Rejected, false],
-    [EOrderStatus.Rejected, EOrderStatus.Requested, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.Initiated, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.Completed, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRequested, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.PreparationRequested, false],
   ])('Order Status Transitions', (from, to, success) => {
     it(`should${success ? ' ' : ' not '}allow transition from ${from} to ${to}`, () => {
       const target = OrderStatus.create(from as OrderStatusValues);
       const methods: Record<OrderStatusValues, string> = {
-        Completed: 'complete',
-        Initiated: 'initiate',
-        Requested: 'request',
-        Rejected: 'reject',
+        [EOrderStatus.Initiated]: 'initiate',
+        [EOrderStatus.Completed]: 'complete',
+        [EOrderStatus.PreparationRequested]: 'requestPreparation',
+        [EOrderStatus.PaymentRequested]: 'requestPayment',
+        [EOrderStatus.PaymentRejected]: 'rejectPayment',
       };
       const method = methods[to];
       if (success) {

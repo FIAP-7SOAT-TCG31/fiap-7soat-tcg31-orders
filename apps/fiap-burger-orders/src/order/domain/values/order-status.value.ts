@@ -2,9 +2,10 @@ import { StatusTransitionException } from '../errors/status-transition.exception
 
 export enum EOrderStatus {
   Initiated = 'Initiated',
-  Requested = 'Requested',
+  PaymentRequested = 'PaymentRequested',
+  PreparationRequested = 'PreparationRequested',
   Completed = 'Completed',
-  Rejected = 'Rejected',
+  PaymentRejected = 'PaymentRejected',
 }
 
 export type OrderStatusValues = `${EOrderStatus}`;
@@ -18,10 +19,11 @@ export abstract class OrderStatus {
 
   static create(value: OrderStatusValues): OrderStatus {
     const StatusMap: Record<OrderStatusValues, new () => OrderStatus> = {
-      Initiated: InitiatedOrderStatus,
-      Requested: RequestedOrderStatus,
-      Completed: CompletedOrderStatus,
-      Rejected: RejectedOrderStatus,
+      [EOrderStatus.Initiated]: InitiatedOrderStatus,
+      [EOrderStatus.PaymentRequested]: PaymentRequestedOrderStatus,
+      [EOrderStatus.PreparationRequested]: PreparationRequestedOrderStatus,
+      [EOrderStatus.PaymentRejected]: PaymentRejectedOrderStatus,
+      [EOrderStatus.Completed]: CompletedOrderStatus,
     };
 
     const Status = StatusMap[value];
@@ -30,50 +32,71 @@ export abstract class OrderStatus {
   }
 
   static initiate() {
-    return OrderStatus.create('Initiated');
+    return OrderStatus.create(EOrderStatus.Initiated);
   }
 
   initiate(): OrderStatus {
     throw new StatusTransitionException(this._value, EOrderStatus.Initiated);
   }
 
-  request(): OrderStatus {
-    throw new StatusTransitionException(this._value, EOrderStatus.Requested);
+  requestPayment(): OrderStatus {
+    throw new StatusTransitionException(
+      this._value,
+      EOrderStatus.PaymentRequested,
+    );
+  }
+
+  requestPreparation(): OrderStatus {
+    throw new StatusTransitionException(
+      this._value,
+      EOrderStatus.PreparationRequested,
+    );
   }
 
   complete(): OrderStatus {
     throw new StatusTransitionException(this._value, EOrderStatus.Completed);
   }
 
-  reject(): OrderStatus {
-    throw new StatusTransitionException(this._value, EOrderStatus.Rejected);
+  rejectPayment(): OrderStatus {
+    throw new StatusTransitionException(
+      this._value,
+      EOrderStatus.PaymentRejected,
+    );
   }
 }
 
 class InitiatedOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'Initiated';
+  protected _value: OrderStatusValues = EOrderStatus.Initiated;
 
-  request() {
-    return OrderStatus.create('Requested');
+  requestPayment() {
+    return OrderStatus.create(EOrderStatus.PaymentRequested);
   }
 }
 
-class RequestedOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'Requested';
+class PaymentRequestedOrderStatus extends OrderStatus {
+  protected _value: OrderStatusValues = EOrderStatus.PaymentRequested;
 
-  complete() {
-    return OrderStatus.create('Completed');
+  requestPreparation() {
+    return OrderStatus.create(EOrderStatus.PreparationRequested);
   }
 
-  reject() {
-    return OrderStatus.create('Rejected');
+  rejectPayment() {
+    return OrderStatus.create(EOrderStatus.PaymentRejected);
+  }
+}
+
+class PreparationRequestedOrderStatus extends OrderStatus {
+  protected _value: OrderStatusValues = EOrderStatus.PreparationRequested;
+
+  complete() {
+    return OrderStatus.create(EOrderStatus.Completed);
   }
 }
 
 class CompletedOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'Completed';
+  protected _value: OrderStatusValues = EOrderStatus.Completed;
 }
 
-class RejectedOrderStatus extends OrderStatus {
-  protected _value: OrderStatusValues = 'Rejected';
+class PaymentRejectedOrderStatus extends OrderStatus {
+  protected _value: OrderStatusValues = EOrderStatus.PaymentRejected;
 }
