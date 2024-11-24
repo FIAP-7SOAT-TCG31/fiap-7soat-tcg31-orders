@@ -52,6 +52,7 @@ export async function createTestApp(
   configureRoutePrefix(app);
   configureOpenAPI(app);
 
+  await setTimeout(250);
   await app.init();
   await setTimeout(250);
   return app;

@@ -26,7 +26,7 @@ export class UpdateItemHandler
 
     if (values.name) {
       const exists = await this.repository.findByName(values.name);
-      if (exists) {
+      if (exists && exists.id !== id) {
         throw new ItemAlreadyExists(values.name);
       }
     }
