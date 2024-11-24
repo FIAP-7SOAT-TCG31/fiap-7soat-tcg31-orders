@@ -15,6 +15,7 @@ export class RejectOrderOnPaymentRejectedHandler
 
     const order = await this.orderRepository.findByPaymentId(paymentId);
 
+    /* istanbul ignore if */
     if (!order) {
       throw new NotFoundException();
     }

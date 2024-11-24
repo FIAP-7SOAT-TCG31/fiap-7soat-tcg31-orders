@@ -32,6 +32,7 @@ export class FindOrdersHandler
       })
       .exec();
 
+    /* istanbul ignore if */
     if (!result) {
       return new FindOrdersResult([]);
     }

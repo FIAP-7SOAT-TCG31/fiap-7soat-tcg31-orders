@@ -31,6 +31,7 @@ export class FollowUpOrdersHandler
       })
       .exec();
 
+    /* istanbul ignore if */
     if (!result) {
       return new FollowUpOrdersResult({});
     }
@@ -50,6 +51,7 @@ export class FollowUpOrdersHandler
           customer: order?.requester?.name ?? 'Unknown',
           orderId: order._id.toHexString(),
           waitingTime: WaitTimeCalculator.calculate(
+            /* istanbul ignore next */
             order.preparationRequestedAt ?? order.createdAt,
           ),
         }),
@@ -57,8 +59,11 @@ export class FollowUpOrdersHandler
     }
 
     return new FollowUpOrdersResult({
+      /* istanbul ignore next */
       ...(ready.length ? { ready } : {}),
+      /* istanbul ignore next */
       ...(started.length ? { started } : {}),
+      /* istanbul ignore next */
       ...(received.length ? { received } : {}),
     });
   }

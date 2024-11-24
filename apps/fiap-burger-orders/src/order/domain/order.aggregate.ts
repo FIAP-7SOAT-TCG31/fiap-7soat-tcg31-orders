@@ -1,4 +1,5 @@
 import { AggregateRoot } from '@fiap-burger/tactical-design/core';
+import { OrderAlreadyInAdvancedStatus } from './errors/order-already-closed.exception';
 import { ItemAdded } from './events/item-added.event';
 import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
@@ -119,7 +120,7 @@ export class Order extends AggregateRoot {
   addItem(item: Item) {
     const status = this._status.value;
     if (status !== EOrderStatus.Initiated) {
-      throw new Error(`Cannot add item, order is already at status ${status}`);
+      throw new OrderAlreadyInAdvancedStatus();
     }
     this.apply(new ItemAdded(OrderItem.fromItem(item)));
   }
@@ -132,9 +133,7 @@ export class Order extends AggregateRoot {
   removeItem(item: OrderItem) {
     const status = this._status.value;
     if (status !== EOrderStatus.Initiated) {
-      throw new Error(
-        `Cannot remove item, order is already at status ${status}`,
-      );
+      throw new OrderAlreadyInAdvancedStatus();
     }
     this.apply(new ItemRemoved(item));
   }

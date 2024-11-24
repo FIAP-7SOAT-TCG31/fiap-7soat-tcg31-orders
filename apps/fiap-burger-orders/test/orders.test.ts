@@ -180,6 +180,65 @@ describe('Orders', () => {
       });
     });
 
+    describe('GET /v1/orders', () => {
+      it('should return all orders without any filters', async () => {
+        const orderId = await createOrder();
+        await checkoutOrder(orderId);
+        const targetResponse = await request(server).get(basePath);
+        expect(targetResponse.statusCode).toBe(200);
+      });
+      it('should return orders in given date range filters', async () => {
+        const from = new Date();
+        const to = new Date();
+        to.setDate(to.getDate() + 1);
+        const orderId = await createOrder();
+        const targetResponse = await request(server)
+          .get(basePath)
+          .query({
+            from: from.toISOString().slice(0, 10),
+            to: to.toISOString().slice(0, 10),
+          });
+        const data = targetResponse.body.data;
+        expect(data).toEqual(
+          expect.arrayContaining([expect.objectContaining({ id: orderId })]),
+        );
+      });
+
+      it('should return all orders up to provided date', async () => {
+        const to = new Date();
+        const targetResponse = await request(server)
+          .get(basePath)
+          .query({
+            to: to.toISOString().slice(0, 10),
+          });
+        const data = targetResponse.body.data;
+        expect(data).toEqual([]);
+      });
+
+      it('should return all orders begining at provided date', async () => {
+        const from = new Date();
+        from.setDate(from.getDate() + 1);
+        const targetResponse = await request(server)
+          .get(basePath)
+          .query({
+            from: from.toISOString().slice(0, 10),
+          });
+        const data = targetResponse.body.data;
+        expect(data).toEqual([]);
+      });
+
+      it('should return with the given criterea', async () => {
+        const email = 'john@doe.com';
+        const cpf = '01234567890';
+        const status = 'Created';
+        const targetResponse = await request(server)
+          .get(basePath)
+          .query({ email, cpf, status });
+        const data = targetResponse.body.data;
+        expect(data).toEqual([]);
+      });
+    });
+
     describe('POST /v1/orders/:id/complete', () => {
       it('should complete order', async () => {
         const orderId = await createOrder();
@@ -197,10 +256,20 @@ describe('Orders', () => {
         expect(target.status).toBe(EOrderStatus.Completed);
       });
 
+      it('should return error when order is in an invalid status', async () => {
+        const orderId = await createOrder();
+        const targetResponse = await request(server).post(
+          `${basePath}/${orderId}/complete`,
+        );
+        const target = await getOrder(orderId);
+        expect(targetResponse.statusCode).toBe(422);
+        expect(target.status).toBe(EOrderStatus.Initiated);
+      });
+
       it('should return not found when order does not exist', async () => {
         const orderId = new Types.ObjectId().toHexString();
         const targetResponse = await request(server).post(
-          `${basePath}/${orderId}/checkout`,
+          `${basePath}/${orderId}/complete`,
         );
         const { statusCode } = targetResponse;
         expect(statusCode).toBe(404);
@@ -217,6 +286,18 @@ describe('Orders', () => {
         const { statusCode } = putResponse;
         const orderResponse = await getOrder(orderId);
         expect(statusCode).toBe(204);
+        expect(orderResponse.items.length).toBe(items.length);
+      });
+
+      it('should return an error when trying to add items to checked out order', async () => {
+        const orderId = await createOrder();
+        await checkoutOrder(orderId);
+        const putResponse = await request(server)
+          .put(`${basePath}/${orderId}`)
+          .send({ items });
+        const { statusCode } = putResponse;
+        const orderResponse = await getOrder(orderId);
+        expect(statusCode).toBe(422);
         expect(orderResponse.items.length).toBe(items.length);
       });
 
@@ -274,6 +355,35 @@ describe('Orders', () => {
         const targetOrder = await getOrder(orderId);
         expect(statusCode).toBe(204);
         expect(targetOrder.items.length).toBe(items.length - 1);
+      });
+
+      it('should return an error when order is already closed', async () => {
+        const orderId = await createOrder();
+        await checkoutOrder(orderId);
+        const orderResponse = await getOrder(orderId);
+        const patchResponse = await request(server)
+          .patch(`${basePath}/${orderId}`)
+          .send({
+            items: [{ key: orderResponse.items[0].key }],
+          });
+        const { statusCode } = patchResponse;
+        const targetOrder = await getOrder(orderId);
+        expect(statusCode).toBe(422);
+        expect(targetOrder.items.length).toBe(items.length);
+      });
+
+      it('should not return an error when item was already removed', async () => {
+        const orderId = await createOrder();
+        await checkoutOrder(orderId);
+        const patchResponse = await request(server)
+          .patch(`${basePath}/${orderId}`)
+          .send({
+            items: [{ key: randomUUID() }],
+          });
+        const { statusCode } = patchResponse;
+        const targetOrder = await getOrder(orderId);
+        expect(statusCode).toBe(204);
+        expect(targetOrder.items.length).toBe(items.length);
       });
 
       it('should not return error when order has no items', async () => {

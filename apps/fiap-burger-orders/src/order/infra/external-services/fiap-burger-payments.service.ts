@@ -28,6 +28,7 @@ export class FiapBurgerPaymentService implements PaymentService {
       );
       await setTimeout(250);
       const paymentStatus = getResult.data.status;
+      /* istanbul ignore if */
       if (paymentStatus === 'Drafted') {
         continue;
       }

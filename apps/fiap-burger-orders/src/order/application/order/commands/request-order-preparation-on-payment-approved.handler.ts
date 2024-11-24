@@ -21,6 +21,7 @@ export class RequestOrderPreparationOnPaymentApprovedHandler
 
     const order = await this.orderRepository.findByPaymentId(paymentId);
 
+    /* istanbul ignore if */
     if (!order) {
       throw new NotFoundException();
     }

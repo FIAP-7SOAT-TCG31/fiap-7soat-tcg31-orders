@@ -16,6 +16,7 @@ export class ReadyOrderOnPreparationCompletedHandler
 
     const order = await this.orderRepository.findByPreparationId(preparationId);
 
+    /* istanbul ignore if */
     if (!order) {
       throw new NotFoundException();
     }

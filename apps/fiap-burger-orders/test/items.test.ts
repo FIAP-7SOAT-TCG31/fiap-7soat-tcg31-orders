@@ -17,9 +17,9 @@ const randomCategory = () => {
 
 const randomItem = () => {
   const dish = faker.food.dish();
-
+  const [randomPrefix] = randomUUID().split('-');
   return {
-    name: dish,
+    name: `${randomPrefix} ${dish}`,
     price: Number(faker.finance.amount({ min: 1, max: 10 })),
     description: `${faker.food.adjective()} ${dish}`,
     type: randomCategory(),
@@ -48,6 +48,13 @@ describe('Items', () => {
       const { statusCode, body } = postResponse;
       expect(statusCode).toBe(201);
       expect(body).toEqual({ id: expect.any(String) });
+    });
+    it('should not allow creating the same item', async () => {
+      const item = randomItem();
+      await request(server).post(basePath).send(item);
+      const postResponse = await request(server).post(basePath).send(item);
+      const { statusCode } = postResponse;
+      expect(statusCode).toBe(422);
     });
   });
 
