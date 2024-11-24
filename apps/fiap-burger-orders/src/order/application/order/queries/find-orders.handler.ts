@@ -46,6 +46,7 @@ export class FindOrdersHandler
             paymentId: x.paymentId,
             qrCode: x.qrCode,
             preparationId: x.preparationId,
+            preparationRequestedAt: x.preparationRequestedAt,
             rejectionReason: x.rejectionReason,
             requester: x.requester
               ? {

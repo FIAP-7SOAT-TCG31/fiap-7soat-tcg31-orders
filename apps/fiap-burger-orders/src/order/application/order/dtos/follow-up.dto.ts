@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class OrderFollowUp {
   @ApiProperty()
@@ -16,13 +16,13 @@ export class OrderFollowUp {
 }
 
 export class FollowUpOutput {
-  @ApiProperty({ type: [OrderFollowUp] })
+  @ApiPropertyOptional({ type: [OrderFollowUp] })
   public readonly ready?: OrderFollowUp[];
 
-  @ApiProperty({ type: [OrderFollowUp] })
+  @ApiPropertyOptional({ type: [OrderFollowUp] })
   public readonly started?: OrderFollowUp[];
 
-  @ApiProperty({ type: [OrderFollowUp] })
+  @ApiPropertyOptional({ type: [OrderFollowUp] })
   public readonly received?: OrderFollowUp[];
 
   constructor(values: FollowUpOutput) {

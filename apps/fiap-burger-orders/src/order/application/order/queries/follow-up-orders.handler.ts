@@ -24,9 +24,9 @@ export class FollowUpOrdersHandler
     const result = await this.queryModel
       .find({
         status: [
-          EOrderStatus.PreparationRequested, // Received
-          // EOrderStatus.PreparationStarted, // Started
-          EOrderStatus.PreparationCompleted, // Ready
+          EOrderStatus.PreparationRequested,
+          EOrderStatus.PreparationStarted,
+          EOrderStatus.PreparationCompleted,
         ],
       })
       .exec();
@@ -42,15 +42,16 @@ export class FollowUpOrdersHandler
     for (const order of result) {
       const orderGroup = {
         [EOrderStatus.PreparationCompleted]: ready,
-        // [EOrderStatus.PreparationStarted]: started,
-        [EOrderStatus.PreparationRequested]: ready,
+        [EOrderStatus.PreparationStarted]: started,
+        [EOrderStatus.PreparationRequested]: received,
       }[order.status];
       orderGroup.push(
         new OrderFollowUp({
           customer: order?.requester?.name ?? 'Unknown',
           orderId: order._id.toHexString(),
-          // TODO: Should use order.requestedPreparationAt
-          waitingTime: WaitTimeCalculator.calculate(order.createdAt),
+          waitingTime: WaitTimeCalculator.calculate(
+            order.preparationRequestedAt ?? order.createdAt,
+          ),
         }),
       );
     }

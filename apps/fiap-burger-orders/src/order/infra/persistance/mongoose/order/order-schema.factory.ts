@@ -28,6 +28,7 @@ export class MongooseOrderSchemaFactory
       paymentId: entity.paymentId,
       qrCode: entity.qrCode,
       preparationId: entity.preparationId,
+      preparationRequestedAt: entity.preparationRequestedAt,
       rejectionReason: entity.rejectionReason,
     };
   }
@@ -48,6 +49,7 @@ export class MongooseOrderSchemaFactory
       entitySchema.paymentId,
       entitySchema.qrCode,
       entitySchema.preparationId,
+      entitySchema.preparationRequestedAt,
       entitySchema.rejectionReason,
     );
   }

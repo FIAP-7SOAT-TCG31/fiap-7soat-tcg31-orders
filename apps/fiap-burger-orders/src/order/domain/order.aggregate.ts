@@ -24,6 +24,7 @@ export class Order extends AggregateRoot {
     private _paymentId: string = null,
     private _qrCode: string = null,
     private _preparationId: string = null,
+    private _preparationRequestedAt: Date = null,
     private _rejectionReason: string = null,
   ) {
     super(_id);
@@ -57,6 +58,10 @@ export class Order extends AggregateRoot {
     return this._preparationId;
   }
 
+  get preparationRequestedAt() {
+    return this._preparationRequestedAt;
+  }
+
   get rejectionReason() {
     return this._rejectionReason;
   }
@@ -76,6 +81,7 @@ export class Order extends AggregateRoot {
   [OrderPreparationRequested.handler](event: OrderPreparationRequested) {
     this._status = this._status.requestPreparation();
     this._preparationId = event.preparationId;
+    this._preparationRequestedAt = event.requestedAt;
   }
 
   startPreparation() {

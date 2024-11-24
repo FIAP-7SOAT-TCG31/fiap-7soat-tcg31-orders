@@ -15,6 +15,7 @@ import { RemoveItemsFromOrderHandler } from './order/commands/remove-items-from-
 import { RequestOrderPreparationOnPaymentApprovedHandler } from './order/commands/request-order-preparation-on-payment-approved.handler';
 import { StartOrderPreparationOnPreparationStartedHandler } from './order/commands/start-order-preparation-on-preparation-started.handler';
 import { FindOrdersHandler } from './order/queries/find-orders.handler';
+import { FollowUpOrdersHandler } from './order/queries/follow-up-orders.handler';
 import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
 
 const QueryHandlers = [
@@ -22,6 +23,7 @@ const QueryHandlers = [
   FindItemsHandler,
   GetOrderByIdHandler,
   FindOrdersHandler,
+  FollowUpOrdersHandler,
 ];
 const CommandHandlers = [
   CreateItemHandler,

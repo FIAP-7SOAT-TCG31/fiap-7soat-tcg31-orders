@@ -50,6 +50,9 @@ export class MongooseOrderSchema extends MongooseEntitySchema {
   preparationId?: string;
 
   @Prop()
+  preparationRequestedAt?: Date;
+
+  @Prop()
   rejectionReason?: string;
 }
 

@@ -4,21 +4,23 @@ import { INestApplication } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Types } from 'mongoose';
-import { EOrderStatus } from '../../../domain/values/order-status.value';
 import { MongooseOrderSchema } from '../../../infra/persistance/mongoose/order/order.schema';
-import { Order } from '../dtos/order.dto';
-import { FindOrdersHandler } from './find-orders.handler';
-import { FindOrdersQuery, FindOrdersResult } from './find-orders.query';
+import { OrderFollowUp } from '../dtos/follow-up.dto';
+import { FollowUpOrdersHandler } from './follow-up-orders.handler';
+import {
+  FollowUpOrdersQuery,
+  FollowUpOrdersResult,
+} from './follow-up-orders.query';
 
-describe('FindOrdersHandler', () => {
+describe('FollowUpOrdersHandler', () => {
   let app: INestApplication;
-  let target: FindOrdersHandler;
+  let target: FollowUpOrdersHandler;
   let model: FakeMongooseModel<MongooseOrderSchema>;
 
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        FindOrdersHandler,
+        FollowUpOrdersHandler,
         {
           provide: getModelToken(MongooseOrderSchema.name),
           useClass: FakeMongooseModel,
@@ -27,30 +29,28 @@ describe('FindOrdersHandler', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    target = app.get(FindOrdersHandler);
+    target = app.get(FollowUpOrdersHandler);
     model = app.get(getModelToken(MongooseOrderSchema.name));
   });
 
   it('should return Empty if no order was found', async () => {
-    const query = new FindOrdersQuery({});
+    const query = new FollowUpOrdersQuery();
     jest.spyOn(model, 'exec').mockResolvedValue(null);
     const result = await target.execute(query);
-    expect(result.data).toEqual([]);
+    expect(result).toBeInstanceOf(FollowUpOrdersResult);
   });
 
-  it.each([
-    new FindOrdersQuery({ customerCpf: '01234567890' }),
-    new FindOrdersQuery({ customerEmail: faker.internet.email() }),
-    new FindOrdersQuery({ status: EOrderStatus.Initiated }),
-    new FindOrdersQuery({ from: new Date(), to: new Date() }),
-    new FindOrdersQuery({ from: new Date() }),
-    new FindOrdersQuery({ to: new Date() }),
-  ])('should return existing for given criterea', async (query) => {
+  it('should return followup groups', async () => {
+    const preparationRequestedAt = new Date();
+    preparationRequestedAt.setUTCMinutes(
+      preparationRequestedAt.getUTCMinutes() - 5,
+    );
     const schema: MongooseOrderSchema = {
       _id: new Types.ObjectId(),
       items: [{ key: '123', name: 'X-Burger', price: 12.99 }],
-      status: 'Completed',
+      status: 'PreparationRequested',
       total: 12.99,
+      preparationRequestedAt,
       requester: {
         name: faker.person.fullName(),
         cpf: '01234567890',
@@ -60,9 +60,10 @@ describe('FindOrdersHandler', () => {
       updatedAt: new Date(),
     };
     jest.spyOn(model, 'exec').mockResolvedValue([schema]);
-    const result = await target.execute(query);
-    expect(result).toBeInstanceOf(FindOrdersResult);
-    expect(result.data).toBeInstanceOf(Array);
-    expect(result.data[0]).toBeInstanceOf(Order);
+    const result = await target.execute(new FollowUpOrdersQuery());
+    expect(result).toBeInstanceOf(FollowUpOrdersResult);
+    expect(result.data.received).toBeInstanceOf(Array);
+    expect(result.data.received[0]).toBeInstanceOf(OrderFollowUp);
+    expect(result.data.received[0].waitingTime).toMatch(/\d+:\d{2}:\d{2}/g);
   });
 });

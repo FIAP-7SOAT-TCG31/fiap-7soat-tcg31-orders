@@ -10,6 +10,7 @@ import { CheckoutOrderController } from './order/checkout-order.controller';
 import { CompleteOrderController } from './order/complete-order.controller';
 import { CreateOrderController } from './order/create-order.controller';
 import { FindOrdersController } from './order/find-orders.controller';
+import { FollowUpOrdersController } from './order/follow-up-orders.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
 import { OnPaymentApprovedRequestPreparationController } from './order/on-payment-approved-request-prepration.controller';
 import { OnPaymentRejectedRejectOrderController } from './order/on-payment-rejected-reject-order.controller';
@@ -29,6 +30,7 @@ const HttpDrivers = [
   RemoveItemsFromOrderController,
   CheckoutOrderController,
   CompleteOrderController,
+  FollowUpOrdersController,
 ];
 const AmqpDrivers = [
   OnPaymentApprovedRequestPreparationController,

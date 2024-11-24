@@ -42,6 +42,9 @@ export class Order {
   public readonly preparationId?: string;
 
   @ApiPropertyOptional()
+  public readonly preparationRequestedAt?: Date;
+
+  @ApiPropertyOptional()
   public readonly rejectionReason?: string;
 
   @ApiProperty()
