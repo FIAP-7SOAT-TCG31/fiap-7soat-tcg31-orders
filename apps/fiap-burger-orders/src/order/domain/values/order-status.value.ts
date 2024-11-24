@@ -4,6 +4,7 @@ export enum EOrderStatus {
   Initiated = 'Initiated',
   PaymentRequested = 'PaymentRequested',
   PreparationRequested = 'PreparationRequested',
+  PreparationCompleted = 'PreparationCompleted',
   Completed = 'Completed',
   PaymentRejected = 'PaymentRejected',
 }
@@ -22,6 +23,7 @@ export abstract class OrderStatus {
       [EOrderStatus.Initiated]: InitiatedOrderStatus,
       [EOrderStatus.PaymentRequested]: PaymentRequestedOrderStatus,
       [EOrderStatus.PreparationRequested]: PreparationRequestedOrderStatus,
+      [EOrderStatus.PreparationCompleted]: PreparationCompletedOrderStatus,
       [EOrderStatus.PaymentRejected]: PaymentRejectedOrderStatus,
       [EOrderStatus.Completed]: CompletedOrderStatus,
     };
@@ -50,6 +52,13 @@ export abstract class OrderStatus {
     throw new StatusTransitionException(
       this._value,
       EOrderStatus.PreparationRequested,
+    );
+  }
+
+  completePreparation(): OrderStatus {
+    throw new StatusTransitionException(
+      this._value,
+      EOrderStatus.PreparationCompleted,
     );
   }
 
@@ -87,6 +96,14 @@ class PaymentRequestedOrderStatus extends OrderStatus {
 
 class PreparationRequestedOrderStatus extends OrderStatus {
   protected _value: OrderStatusValues = EOrderStatus.PreparationRequested;
+
+  completePreparation() {
+    return OrderStatus.create(EOrderStatus.PreparationCompleted);
+  }
+}
+
+class PreparationCompletedOrderStatus extends OrderStatus {
+  protected _value: OrderStatusValues = EOrderStatus.PreparationCompleted;
 
   complete() {
     return OrderStatus.create(EOrderStatus.Completed);

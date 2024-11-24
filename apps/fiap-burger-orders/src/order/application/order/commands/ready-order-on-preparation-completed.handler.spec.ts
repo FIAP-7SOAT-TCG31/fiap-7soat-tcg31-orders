@@ -10,12 +10,12 @@ import { Item } from '../../../domain/item.entity';
 import { Order } from '../../../domain/order.aggregate';
 import { OrderStatus } from '../../../domain/values/order-status.value';
 import { OrderRepository } from '../abstractions/order.repository';
-import { CompleteOrderOnPreparationCompletedCommand } from './complete-order-on-preparation-completed.command';
-import { CompleteOrderOnPreparationCompletedHandler } from './complete-order-on-preparation-completed.handler';
+import { ReadyOrderOnPreparationCompletedCommand } from './ready-order-on-preparation-completed.command';
+import { ReadyOrderOnPreparationCompletedHandler } from './ready-order-on-preparation-completed.handler';
 
-describe('CompleteOrderOnPreparationCompletedHandler', () => {
+describe('ReadyOrderOnPreparationCompletedHandler', () => {
   let app: INestApplication;
-  let target: CompleteOrderOnPreparationCompletedHandler;
+  let target: ReadyOrderOnPreparationCompletedHandler;
   let orderRepository: OrderRepository;
 
   const itemPrice = 19.9;
@@ -35,7 +35,7 @@ describe('CompleteOrderOnPreparationCompletedHandler', () => {
   beforeEach(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       providers: [
-        CompleteOrderOnPreparationCompletedHandler,
+        ReadyOrderOnPreparationCompletedHandler,
         {
           provide: TransactionManager,
           useClass: FakeTransactionManager,
@@ -48,7 +48,7 @@ describe('CompleteOrderOnPreparationCompletedHandler', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    target = app.get(CompleteOrderOnPreparationCompletedHandler);
+    target = app.get(ReadyOrderOnPreparationCompletedHandler);
     orderRepository = app.get(OrderRepository);
 
     orderRepository.findByPreparationId = jest.fn();
@@ -57,26 +57,26 @@ describe('CompleteOrderOnPreparationCompletedHandler', () => {
   it('should throw NotFoundException when Order does not exist', async () => {
     jest.spyOn(orderRepository, 'findByPreparationId').mockResolvedValue(null);
     jest.spyOn(orderRepository, 'update');
-    const command = new CompleteOrderOnPreparationCompletedCommand('123');
+    const command = new ReadyOrderOnPreparationCompletedCommand('123');
     await expect(() => target.execute(command)).rejects.toThrow(
       NotFoundException,
     );
     expect(orderRepository.update).not.toHaveBeenCalled();
   });
 
-  it('should complete order', async () => {
+  it('should complete order preparation', async () => {
     const order = new Order(randomUUID(), null, OrderStatus.initiate());
     order.addItem(createItem());
     order.checkout(randomUUID(), randomUUID());
     order.requestPreparation('');
-    jest.spyOn(order, 'complete');
+    jest.spyOn(order, 'completePreparation');
     jest.spyOn(orderRepository, 'findByPreparationId').mockResolvedValue(order);
     jest.spyOn(orderRepository, 'update').mockResolvedValue();
-    const command = new CompleteOrderOnPreparationCompletedCommand(
+    const command = new ReadyOrderOnPreparationCompletedCommand(
       order.paymentId,
     );
     await target.execute(command);
     expect(orderRepository.update).toHaveBeenCalled();
-    expect(order.complete).toHaveBeenCalled();
+    expect(order.completePreparation).toHaveBeenCalled();
   });
 });

@@ -3,7 +3,14 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsNumber, IsObject, IsString } from 'class-validator';
 import { Entity } from './entity';
 
-export abstract class DomainEvent /* NOSONAR */ {}
+export abstract class DomainEvent /* NOSONAR */ {
+  static getHandler() {
+    return `on${this.name}`;
+  }
+  static get handler() {
+    return this.getHandler();
+  }
+}
 
 export class AggregateEvent<T extends DomainEvent = DomainEvent> {
   @ApiProperty()
@@ -46,6 +53,8 @@ export class AggregateEvent<T extends DomainEvent = DomainEvent> {
     this.data = data;
   }
 }
+
+export abstract class IntegrationEvent extends AggregateEvent {}
 
 export interface AggregateContext {
   /**

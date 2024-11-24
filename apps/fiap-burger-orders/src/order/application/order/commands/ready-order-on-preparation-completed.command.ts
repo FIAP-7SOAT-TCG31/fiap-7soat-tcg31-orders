@@ -1,3 +1,3 @@
-export class CompleteOrderOnPreparationCompletedCommand {
+export class ReadyOrderOnPreparationCompletedCommand {
   constructor(public readonly preparationId: string) {}
 }

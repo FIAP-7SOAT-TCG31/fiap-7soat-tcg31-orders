@@ -1,16 +1,16 @@
 import { NotFoundException } from '@nestjs/common';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { OrderRepository } from '../abstractions/order.repository';
-import { CompleteOrderOnPreparationCompletedCommand } from './complete-order-on-preparation-completed.command';
+import { ReadyOrderOnPreparationCompletedCommand } from './ready-order-on-preparation-completed.command';
 
-@CommandHandler(CompleteOrderOnPreparationCompletedCommand)
-export class CompleteOrderOnPreparationCompletedHandler
-  implements ICommandHandler<CompleteOrderOnPreparationCompletedCommand, void>
+@CommandHandler(ReadyOrderOnPreparationCompletedCommand)
+export class ReadyOrderOnPreparationCompletedHandler
+  implements ICommandHandler<ReadyOrderOnPreparationCompletedCommand, void>
 {
   constructor(private readonly orderRepository: OrderRepository) {}
 
   async execute(
-    command: CompleteOrderOnPreparationCompletedCommand,
+    command: ReadyOrderOnPreparationCompletedCommand,
   ): Promise<void> {
     const { preparationId } = command;
 
@@ -20,7 +20,7 @@ export class CompleteOrderOnPreparationCompletedHandler
       throw new NotFoundException();
     }
 
-    order.complete();
+    order.completePreparation();
 
     await this.orderRepository.update(order);
     await order.commit();

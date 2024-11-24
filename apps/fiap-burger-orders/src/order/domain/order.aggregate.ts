@@ -4,8 +4,9 @@ import { ItemRemoved } from './events/item-removed.event';
 import { OrderCheckedOut } from './events/order-checked-out.event';
 import { OrderCompleted } from './events/order-completed.event';
 import { OrderCreated } from './events/order-created.event';
+import { OrderPreparationCompleted } from './events/order-preparation-completed.event';
+import { OrderPreparationRequested } from './events/order-preparation-requested.event';
 import { OrderRejected } from './events/order-rejected.event';
-import { PreparationRequested } from './events/preparation-requested.event';
 import { Item } from './item.entity';
 import { OrderItem } from './values/order-item.value';
 import { OrderRejectionReason } from './values/order-rejection-reason.value';
@@ -63,15 +64,23 @@ export class Order extends AggregateRoot {
     this.apply(new OrderCreated());
   }
 
-  onOrderCreated() {
+  [OrderCreated.handler]() {
     this._status = OrderStatus.initiate();
   }
 
-  requestPreparation(preparationId: string) {
-    this.apply(new PreparationRequested(preparationId));
+  completePreparation() {
+    this.apply(new OrderPreparationCompleted());
   }
 
-  onPreparationRequested(event: PreparationRequested) {
+  [OrderPreparationCompleted.handler]() {
+    this._status = this._status.completePreparation();
+  }
+
+  requestPreparation(preparationId: string) {
+    this.apply(new OrderPreparationRequested(preparationId));
+  }
+
+  [OrderPreparationRequested.handler](event: OrderPreparationRequested) {
     this._status = this._status.requestPreparation();
     this._preparationId = event.preparationId;
   }
@@ -80,7 +89,7 @@ export class Order extends AggregateRoot {
     this.apply(new OrderRejected(reason));
   }
 
-  onOrderRejected(event: OrderRejected) {
+  [OrderRejected.handler](event: OrderRejected) {
     this._status = this._status.rejectPayment();
     this._rejectionReason = event.reason;
   }
@@ -89,7 +98,7 @@ export class Order extends AggregateRoot {
     this.apply(new OrderCompleted());
   }
 
-  onOrderCompleted() {
+  [OrderCompleted.handler]() {
     this._status = this._status.complete();
   }
 
@@ -101,7 +110,7 @@ export class Order extends AggregateRoot {
     this.apply(new ItemAdded(OrderItem.fromItem(item)));
   }
 
-  onItemAdded({ item }: ItemAdded) {
+  [ItemAdded.handler]({ item }: ItemAdded) {
     this._items.push(item);
     this.calculatePrice(item.price);
   }
@@ -116,7 +125,7 @@ export class Order extends AggregateRoot {
     this.apply(new ItemRemoved(item));
   }
 
-  onItemRemoved({ item }: ItemRemoved) {
+  [ItemRemoved.handler]({ item }: ItemRemoved) {
     const foundItem = this._items.findIndex((x) => x.key === item.key);
     if (foundItem < 0) {
       return;
@@ -129,7 +138,7 @@ export class Order extends AggregateRoot {
     this.apply(new OrderCheckedOut(paymentId, qrCode));
   }
 
-  onOrderCheckedOut(event: OrderCheckedOut) {
+  [OrderCheckedOut.handler](event: OrderCheckedOut) {
     this._status = this._status.requestPayment();
     this._paymentId = event.paymentId;
     this._qrCode = event.qrCode;

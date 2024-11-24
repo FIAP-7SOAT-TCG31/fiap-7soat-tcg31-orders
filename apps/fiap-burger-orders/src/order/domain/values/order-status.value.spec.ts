@@ -9,6 +9,7 @@ const AllStatuses: OrderStatusValues[] = [
   EOrderStatus.Initiated,
   EOrderStatus.PaymentRequested,
   EOrderStatus.PreparationRequested,
+  EOrderStatus.PreparationCompleted,
   EOrderStatus.PaymentRejected,
   EOrderStatus.Completed,
 ];
@@ -32,38 +33,62 @@ describe('OrderStatus', () => {
 
   describe.each([
     [EOrderStatus.Initiated, EOrderStatus.Initiated, false],
-    [EOrderStatus.Initiated, EOrderStatus.Completed, false],
-    [EOrderStatus.Initiated, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.Initiated, EOrderStatus.PreparationRequested, false],
     [EOrderStatus.Initiated, EOrderStatus.PaymentRequested, true],
+    [EOrderStatus.Initiated, EOrderStatus.PreparationRequested, false],
+    [EOrderStatus.Initiated, EOrderStatus.PreparationCompleted, false],
+    [EOrderStatus.Initiated, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.Initiated, EOrderStatus.Completed, false],
 
     [EOrderStatus.PaymentRequested, EOrderStatus.Initiated, false],
-    [EOrderStatus.PaymentRequested, EOrderStatus.Completed, false],
-    [EOrderStatus.PaymentRequested, EOrderStatus.PaymentRejected, true],
     [EOrderStatus.PaymentRequested, EOrderStatus.PaymentRequested, false],
     [EOrderStatus.PaymentRequested, EOrderStatus.PreparationRequested, true],
+    [EOrderStatus.PaymentRequested, EOrderStatus.PreparationCompleted, false],
+    [EOrderStatus.PaymentRequested, EOrderStatus.PaymentRejected, true],
+    [EOrderStatus.PaymentRequested, EOrderStatus.Completed, false],
 
     [EOrderStatus.PreparationRequested, EOrderStatus.Initiated, false],
+    [EOrderStatus.PreparationRequested, EOrderStatus.PaymentRequested, false],
     [
       EOrderStatus.PreparationRequested,
       EOrderStatus.PreparationRequested,
       false,
     ],
+    [
+      EOrderStatus.PreparationRequested,
+      EOrderStatus.PreparationCompleted,
+      true,
+    ],
     [EOrderStatus.PreparationRequested, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.PreparationRequested, EOrderStatus.PaymentRequested, false],
-    [EOrderStatus.PreparationRequested, EOrderStatus.Completed, true],
+    [EOrderStatus.PreparationRequested, EOrderStatus.Completed, false],
+
+    [EOrderStatus.PreparationCompleted, EOrderStatus.Initiated, false],
+    [EOrderStatus.PreparationCompleted, EOrderStatus.PaymentRequested, false],
+    [
+      EOrderStatus.PreparationCompleted,
+      EOrderStatus.PreparationRequested,
+      false,
+    ],
+    [
+      EOrderStatus.PreparationCompleted,
+      EOrderStatus.PreparationCompleted,
+      false,
+    ],
+    [EOrderStatus.PreparationCompleted, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.PreparationCompleted, EOrderStatus.Completed, true],
 
     [EOrderStatus.Completed, EOrderStatus.Initiated, false],
-    [EOrderStatus.Completed, EOrderStatus.Completed, false],
-    [EOrderStatus.Completed, EOrderStatus.PaymentRejected, false],
-    [EOrderStatus.Completed, EOrderStatus.PreparationRequested, false],
     [EOrderStatus.Completed, EOrderStatus.PaymentRequested, false],
+    [EOrderStatus.Completed, EOrderStatus.PreparationRequested, false],
+    [EOrderStatus.Completed, EOrderStatus.PreparationCompleted, false],
+    [EOrderStatus.Completed, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.Completed, EOrderStatus.Completed, false],
 
     [EOrderStatus.PaymentRejected, EOrderStatus.Initiated, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.Completed, false],
-    [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRejected, false],
     [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRequested, false],
     [EOrderStatus.PaymentRejected, EOrderStatus.PreparationRequested, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.PreparationCompleted, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.PaymentRejected, false],
+    [EOrderStatus.PaymentRejected, EOrderStatus.Completed, false],
   ])('Order Status Transitions', (from, to, success) => {
     it(`should${success ? ' ' : ' not '}allow transition from ${from} to ${to}`, () => {
       const target = OrderStatus.create(from as OrderStatusValues);
@@ -71,6 +96,7 @@ describe('OrderStatus', () => {
         [EOrderStatus.Initiated]: 'initiate',
         [EOrderStatus.Completed]: 'complete',
         [EOrderStatus.PreparationRequested]: 'requestPreparation',
+        [EOrderStatus.PreparationCompleted]: 'completePreparation',
         [EOrderStatus.PaymentRequested]: 'requestPayment',
         [EOrderStatus.PaymentRejected]: 'rejectPayment',
       };

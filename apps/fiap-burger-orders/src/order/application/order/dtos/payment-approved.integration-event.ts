@@ -1,3 +1,3 @@
-import { AggregateEvent } from '@fiap-burger/tactical-design/core';
+import { IntegrationEvent } from '@fiap-burger/tactical-design/core';
 
-export class PaymentApproved extends AggregateEvent {}
+export class PaymentApproved extends IntegrationEvent {}
