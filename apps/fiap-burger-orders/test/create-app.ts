@@ -16,9 +16,8 @@ export const env = {
 export const createTestApp = async (silentLogger: boolean = true) =>
   baseCreateTestApp(AppModule, { env, silentLogger });
 
-let mockService: SetupServerApi;
 export const createMockService = () => {
-  mockService = setupServer(
+  const mockService = setupServer(
     ...getPayementsServiceHandlers(env.BASE_URL_PAYMENT_SERVICE),
     ...getPrerationServiceHandlers(env.BASE_URL_PREPARATION_SERVICE),
   );
@@ -26,6 +25,6 @@ export const createMockService = () => {
   return mockService;
 };
 
-export const destroyMockService = () => {
+export const destroyMockService = (mockService: SetupServerApi) => {
   mockService.close();
 };

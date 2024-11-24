@@ -4,6 +4,7 @@ import { AggregateEvent } from '@fiap-burger/tactical-design/core';
 import { destroyTestApp } from '@fiap-burger/test-factory/utils';
 import { INestApplication } from '@nestjs/common';
 import { randomUUID } from 'crypto';
+import { SetupServerApi } from 'msw/node';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { setTimeout } from 'timers/promises';
@@ -115,8 +116,10 @@ describe('FollowUp', () => {
     return orderId;
   };
 
+  let mockService: SetupServerApi;
+
   beforeAll(async () => {
-    createMockService();
+    mockService = createMockService();
     app = await createTestApp();
     server = app.getHttpServer();
     await populateItems(server);
@@ -128,7 +131,7 @@ describe('FollowUp', () => {
 
   afterAll(async () => {
     await destroyTestApp(app);
-    destroyMockService();
+    destroyMockService(mockService);
   });
 
   describe('GET /v1/orders-follow-up', () => {
