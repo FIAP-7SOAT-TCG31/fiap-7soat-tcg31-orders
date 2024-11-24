@@ -28,7 +28,7 @@ spec:
             - name: APP_NAME
               value: "FiapBurgerOrder"
             - name: APP_DESCRIPTION
-              value: "Payments Component for Fiap Burger"
+              value: "Orders Component for Fiap Burger"
             - name: APP_VERSION
               value: "1.0.0"
             - name: PORT
