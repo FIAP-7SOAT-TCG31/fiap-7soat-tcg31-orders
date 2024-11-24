@@ -1,8 +1,31 @@
 services:
-  postgres:
-    image: postgres:13
+  mongodb:
+    image: fiapburger/mongodbrs:6
+    build:
+      context: ./localstack
+      dockerfile: ./Dockerfile.mongodb
+    container_name: fiapburger-mongodb
     environment:
-      POSTGRES_PASSWORD: 'fiapburger'
+      MONGO_INITDB_ROOT_USERNAME: 'fiapburger'
+      MONGO_INITDB_ROOT_PASSWORD: 'fiapburger'
+    command: 'mongod --replSet rs0 --keyFile /opt/.keyfile/keyfile --bind_ip_all'
+    ports:
+      - 27017:27017
+  mongodb_init:
+    image: mongo:6
+    container_name: fiapburger-mongodb-init
+    restart: 'on-failure'
+    depends_on: [mongodb]
+    command: >-
+      sh -c "sleep 10 && mongosh -u fiapburger -p fiapburger --host mongodb:27017 --eval 'rs.initiate({
+        \"_id\":\"rs0\",
+        "members":[
+          {
+            \"_id\": 0,
+            \"host\":\"localhost:27017\",
+          }
+        ]
+      })' && if [ $(mongosh -u fiapburger -p fiapburger --quiet --host mongodb:27017 --eval 'rs.status().ok') -eq 1 ]; then exit 0; else exit 1; fi"
   rabbitmq:
     image: fiapburger/rabbitmq:3-management-delayed
     build:
