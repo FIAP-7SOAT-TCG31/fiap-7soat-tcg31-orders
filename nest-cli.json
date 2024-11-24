@@ -1,11 +1,11 @@
 {
   "$schema": "https://json.schemastore.org/nest-cli",
   "collection": "@nestjs/schematics",
-  "sourceRoot": "apps/fiap-burger-preparation/src",
+  "sourceRoot": "apps/fiap-burger-orders/src",
   "compilerOptions": {
     "deleteOutDir": true,
     "webpack": true,
-    "tsConfigPath": "apps/fiap-burger-preparation/tsconfig.app.json"
+    "tsConfigPath": "apps/fiap-burger-orders/tsconfig.app.json"
   },
   "projects": {
     "setup": {
@@ -26,13 +26,13 @@
         "tsConfigPath": "libs/tactical-design/tsconfig.lib.json"
       }
     },
-    "fiap-burger-preparation": {
+    "fiap-burger-orders": {
       "type": "application",
-      "root": "apps/fiap-burger-preparation",
+      "root": "apps/fiap-burger-orders",
       "entryFile": "main",
-      "sourceRoot": "apps/fiap-burger-preparation/src",
+      "sourceRoot": "apps/fiap-burger-orders/src",
       "compilerOptions": {
-        "tsConfigPath": "apps/fiap-burger-preparation/tsconfig.app.json"
+        "tsConfigPath": "apps/fiap-burger-orders/tsconfig.app.json"
       }
     },
     "amqp": {
@@ -55,5 +55,5 @@
     }
   },
   "monorepo": true,
-  "root": "apps/fiap-burger-preparation"
+  "root": "apps/fiap-burger-orders"
 }

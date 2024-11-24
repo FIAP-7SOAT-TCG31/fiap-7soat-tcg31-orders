@@ -1,9 +1,11 @@
 import { AmqpConnection } from '@golevelup/nestjs-rabbitmq';
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Message } from 'amqplib';
+import { AmqpModuleOptions, InjectAmqpModuleOptions } from '../amqp.factory';
 import { BindingOptions } from '../decorators/amqp-binding.decorator';
 import { RetrialPolicy } from '../decorators/amqp-retrial-policy.decorator';
 import { doubleWithEveryAttemptDelayCalculator } from '../utils/amqp-delay.calculator';
+import { withPrefix } from '../utils/amqp-infrastructure.util';
 import { AmqpParams } from '../utils/amqp-params.util';
 import { FailedIdempotencyCheckException } from '../utils/amqp.internals';
 import { formatDLQ } from '../utils/format-dlq.util';
@@ -19,7 +21,11 @@ type ApplyPolicyInput = {
 
 @Injectable()
 export class AmqpRetrialService {
-  constructor(private readonly amqp: AmqpConnection) {}
+  constructor(
+    private readonly amqp: AmqpConnection,
+    @InjectAmqpModuleOptions()
+    private readonly amqpOptions: AmqpModuleOptions,
+  ) {}
 
   async apply(args: ApplyPolicyInput): Promise<string> {
     const { binding, consumeMessage, retrialPolicy, error } = args;
@@ -58,7 +64,9 @@ export class AmqpRetrialService {
       headers[AmqpParams.RoutingKeyHeader] = routingKey;
       headers[AmqpParams.DelayHeader] = calculatedDelay;
       await this.amqp.publish(
-        AmqpParams.DelayedExchange,
+        this.amqpOptions.prefix
+          ? withPrefix(this.amqpOptions.prefix, AmqpParams.DelayedExchange)
+          : AmqpParams.DelayedExchange,
         queue,
         content,
         properties,

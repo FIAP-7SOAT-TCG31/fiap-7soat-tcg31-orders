@@ -25,7 +25,7 @@ export class MongooseEventRepository<
   }
 
   async findByAggregateId(aggregateId: string): Promise<TEvent[]> {
-    return this.find({ aggregateId });
+    return this.find({ aggregateId: new Types.ObjectId(aggregateId) });
   }
 
   async create(event: TEvent): Promise<void> {
@@ -39,7 +39,7 @@ export class MongooseEventRepository<
     entityFilterQuery?: FilterQuery<TSchema>,
   ): Promise<TEvent[]> {
     const foundValues = await this.eventModel
-      .find(entityFilterQuery, {}, { lean: true })
+      .find(entityFilterQuery, {}, { lean: true, sort: { timestamp: 1 } })
       .exec();
     return foundValues.map((entityDocument) =>
       this.toEvent(entityDocument as TSchema),
@@ -77,9 +77,13 @@ export class MongooseEventRepository<
   }
 
   private toEvent(schema: EventSchema<AggregateEvent<DomainEvent>>): TEvent {
-    const domainEvent: DomainEvent = Object.create(DomainEvent);
-    Object.assign(domainEvent, schema.event);
-    (domainEvent.constructor as any).name = schema.eventName;
+    const EventConstructor = function (data) {
+      Object.assign(this, data);
+    };
+    Object.defineProperty(EventConstructor, 'name', {
+      value: schema.eventName,
+    });
+    const domainEvent = new EventConstructor(schema.event);
     return new AggregateEvent(
       schema._id.toHexString(),
       schema.aggregateId.toHexString(),

@@ -1,4 +1,4 @@
-name: FiapBurgerPreparation - CICD
+name: FiapBurgerOrder - CICD
 
 on:
   push:
@@ -108,8 +108,8 @@ jobs:
         with:
           push: true
           tags: |
-            gm50x/fiap-burger-preparation:latest
-            gm50x/fiap-burger-preparation:v${{ github.run_number }}
+            gm50x/fiap-burger-orders:latest
+            gm50x/fiap-burger-orders:v${{ github.run_number }}
   deploy:
     name: 'Deploy Application'
     runs-on: ubuntu-latest

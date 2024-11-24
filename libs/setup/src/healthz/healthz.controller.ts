@@ -1,5 +1,6 @@
 import { AmqpHealthIndicatorService } from '@fiap-burger/amqp';
 import { Controller, Get } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ModuleRef } from '@nestjs/core';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import {
@@ -17,6 +18,7 @@ export class HealthzController {
     private readonly mongodb: MongooseHealthIndicator,
     private readonly http: HttpHealthIndicator,
     private readonly moduleRef: ModuleRef,
+    private readonly config: ConfigService,
   ) {}
 
   private tryGetAMQP(): AmqpHealthIndicatorService {
@@ -36,13 +38,24 @@ export class HealthzController {
   })
   async checkHealth() {
     const amqp = this.tryGetAMQP();
+    const paymentServiceBaseURL = this.config.getOrThrow(
+      'BASE_URL_PAYMENT_SERVICE',
+    );
+    const preparationServiceBaseURL = this.config.getOrThrow(
+      'BASE_URL_PREPARATION_SERVICE',
+    );
 
     return this.health.check([
       () => this.mongodb.pingCheck('Database'),
       () =>
         this.http.pingCheck(
-          'UpstreamSampleTest',
-          'http://localhost:3000/healthz/self',
+          'PaymentsService',
+          `${paymentServiceBaseURL}/healthz/self`,
+        ),
+      () =>
+        this.http.pingCheck(
+          'PreparationService',
+          `${preparationServiceBaseURL}/healthz/self`,
         ),
       () => amqp?.isConnected('MessageBroker'),
     ]);

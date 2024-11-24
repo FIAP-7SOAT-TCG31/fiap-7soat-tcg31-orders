@@ -1,18 +1,60 @@
 import { Injectable } from '@nestjs/common';
+import { ApiProperty } from '@nestjs/swagger';
+import { IsDateString, IsNumber, IsObject, IsString } from 'class-validator';
 import { Entity } from './entity';
 
-export abstract class DomainEvent /* NOSONAR */ {}
+export abstract class DomainEvent /* NOSONAR */ {
+  static getHandler() {
+    return `on${this.name}`;
+  }
+  static get handler() {
+    return this.getHandler();
+  }
+}
 
 export class AggregateEvent<T extends DomainEvent = DomainEvent> {
+  @ApiProperty()
+  @IsString()
+  public readonly id: string;
+
+  @ApiProperty()
+  @IsString()
+  public readonly aggregateId: string;
+
+  @ApiProperty()
+  @IsString()
+  public readonly eventName: string;
+
+  @ApiProperty()
+  @IsDateString()
+  public readonly timestamp: Date;
+
+  @ApiProperty()
+  @IsNumber()
+  public readonly version: number;
+
+  @ApiProperty({ description: 'The internal domain event structure' })
+  @IsObject()
+  public readonly data: T;
+
   constructor(
-    public readonly id: string,
-    public readonly aggregateId: string,
-    public readonly eventName: string,
-    public readonly timestamp: Date,
-    public readonly version: number,
-    public readonly data: T,
-  ) {}
+    id: string,
+    aggregateId: string,
+    eventName: string,
+    timestamp: Date,
+    version: number,
+    data: T,
+  ) {
+    this.id = id;
+    this.aggregateId = aggregateId;
+    this.eventName = eventName;
+    this.timestamp = timestamp;
+    this.version = version;
+    this.data = data;
+  }
 }
+
+export abstract class IntegrationEvent extends AggregateEvent {}
 
 export interface AggregateContext {
   /**
