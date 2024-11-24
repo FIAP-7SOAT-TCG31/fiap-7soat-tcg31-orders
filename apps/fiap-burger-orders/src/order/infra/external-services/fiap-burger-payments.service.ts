@@ -14,7 +14,7 @@ export class FiapBurgerPaymentService implements PaymentService {
   async createPixPayment(
     amount: number,
   ): Promise<{ id: string; qrCode: string }> {
-    const baseURL = this.config.getOrThrow('BASE_URL_PAYMENTS_SERVICE');
+    const baseURL = this.config.getOrThrow('BASE_URL_PAYMENT_SERVICE');
     const result = await this.http.axiosRef.post(`${baseURL}/v1/payments`, {
       type: 'PixQrCode',
       amount,
