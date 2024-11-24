@@ -6,6 +6,7 @@ import { OrderCompleted } from './events/order-completed.event';
 import { OrderCreated } from './events/order-created.event';
 import { OrderPreparationCompleted } from './events/order-preparation-completed.event';
 import { OrderPreparationRequested } from './events/order-preparation-requested.event';
+import { OrderPreparationSarted } from './events/order-preparation-started.event';
 import { OrderRejected } from './events/order-rejected.event';
 import { Item } from './item.entity';
 import { OrderItem } from './values/order-item.value';
@@ -68,14 +69,6 @@ export class Order extends AggregateRoot {
     this._status = OrderStatus.initiate();
   }
 
-  completePreparation() {
-    this.apply(new OrderPreparationCompleted());
-  }
-
-  [OrderPreparationCompleted.handler]() {
-    this._status = this._status.completePreparation();
-  }
-
   requestPreparation(preparationId: string) {
     this.apply(new OrderPreparationRequested(preparationId));
   }
@@ -85,6 +78,21 @@ export class Order extends AggregateRoot {
     this._preparationId = event.preparationId;
   }
 
+  startPreparation() {
+    this.apply(new OrderPreparationSarted());
+  }
+
+  [OrderPreparationSarted.handler]() {
+    this._status = this._status.startPreparation();
+  }
+
+  completePreparation() {
+    this.apply(new OrderPreparationCompleted());
+  }
+
+  [OrderPreparationCompleted.handler]() {
+    this._status = this._status.completePreparation();
+  }
   reject(reason: OrderRejectionReason) {
     this.apply(new OrderRejected(reason));
   }

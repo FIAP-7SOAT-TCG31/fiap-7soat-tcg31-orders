@@ -27,8 +27,6 @@ export class CompleteOrderController {
   @ApiUnprocessableEntityResponse()
   @ApiInternalServerErrorResponse()
   async execute(@Param('id', new ObjectIdValidationPipe()) id: string) {
-    const result = await this.commandBus.execute(new CompleteOrderCommand(id));
-
-    return result.data;
+    await this.commandBus.execute(new CompleteOrderCommand(id));
   }
 }

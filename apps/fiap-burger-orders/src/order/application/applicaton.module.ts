@@ -13,6 +13,7 @@ import { ReadyOrderOnPreparationCompletedHandler } from './order/commands/ready-
 import { RejectOrderOnPaymentRejectedHandler } from './order/commands/reject-order-on-payment-rejected.handler';
 import { RemoveItemsFromOrderHandler } from './order/commands/remove-items-from-order.handler';
 import { RequestOrderPreparationOnPaymentApprovedHandler } from './order/commands/request-order-preparation-on-payment-approved.handler';
+import { StartOrderPreparationOnPreparationStartedHandler } from './order/commands/start-order-preparation-on-preparation-started.handler';
 import { FindOrdersHandler } from './order/queries/find-orders.handler';
 import { GetOrderByIdHandler } from './order/queries/get-order-by-id.handler';
 
@@ -29,8 +30,9 @@ const CommandHandlers = [
   AddItemsToOrderHandler,
   RemoveItemsFromOrderHandler,
   CheckoutOrderHandler,
-  RequestOrderPreparationOnPaymentApprovedHandler,
   RejectOrderOnPaymentRejectedHandler,
+  RequestOrderPreparationOnPaymentApprovedHandler,
+  StartOrderPreparationOnPreparationStartedHandler,
   ReadyOrderOnPreparationCompletedHandler,
   CompleteOrderHandler,
 ];

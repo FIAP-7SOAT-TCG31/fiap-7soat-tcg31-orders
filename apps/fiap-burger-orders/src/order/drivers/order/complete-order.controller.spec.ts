@@ -23,11 +23,10 @@ describe('CompleteOrderController', () => {
       .spyOn(commandBus, 'execute')
       .mockResolvedValue({ data: { qrCode: randomUUID() } });
     const id = '123';
-    const result = await target.execute(id);
+    await target.execute(id);
     expect(commandBus.execute).toHaveBeenCalledWith(
       new CompleteOrderCommand(id),
     );
-    expect(result.qrCode).toBeDefined();
   });
 
   it('should throw if commandBus throws', async () => {
