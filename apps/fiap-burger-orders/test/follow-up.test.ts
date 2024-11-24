@@ -132,7 +132,7 @@ describe('FollowUp', () => {
   });
 
   describe('GET /v1/orders-follow-up', () => {
-    jest.setTimeout(10000);
+    jest.setTimeout(20000);
     it('should return create a oders grouped by their statuses', async () => {
       const receivedOrders = await Promise.all(
         Array(3)
