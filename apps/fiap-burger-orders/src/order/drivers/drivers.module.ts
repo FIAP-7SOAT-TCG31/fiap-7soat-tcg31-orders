@@ -7,6 +7,7 @@ import { GetItemByIdController } from './item/get-item-by-id.controller';
 import { UpdateItemController } from './item/update-item.controller';
 import { AddItemsToOrderController } from './order/add-items-to-order.controller';
 import { CheckoutOrderController } from './order/checkout-order.controller';
+import { CompleteOrderController } from './order/complete-order.controller';
 import { CreateOrderController } from './order/create-order.controller';
 import { FindOrdersController } from './order/find-orders.controller';
 import { GetOrderByIdController } from './order/get-order-by-id.controller';
@@ -26,6 +27,7 @@ const HttpDrivers = [
   AddItemsToOrderController,
   RemoveItemsFromOrderController,
   CheckoutOrderController,
+  CompleteOrderController,
 ];
 const AmqpDrivers = [
   OnPaymentApprovedRequestPreparationController,
