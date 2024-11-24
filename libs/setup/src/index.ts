@@ -27,3 +27,8 @@ export * from './utils/validation.config';
 export * from './utils/versioning.config';
 
 export * from './healthz/healthz.module';
+
+export * from './auth/optional-auth.guard';
+export * from './auth/roles.decorator';
+export * from './auth/roles.guard';
+export * from './auth/user.model';
