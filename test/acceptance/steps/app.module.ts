@@ -1,8 +1,8 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { PreparationSuite } from './step-definitions/preparation.suite';
+import { ItemSuite } from './step-definitions/item.suite';
 @Module({
   imports: [HttpModule],
-  providers: [PreparationSuite],
+  providers: [ItemSuite],
 })
 export class AppModule {}
