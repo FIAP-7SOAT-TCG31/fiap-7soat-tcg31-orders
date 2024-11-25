@@ -1,4 +1,5 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { AuthUser, ERoles, User, WithOptionalAuth } from '@fiap-burger/setup';
+import { Controller, ForbiddenException, Get, Param } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import {
   ApiBadRequestResponse,
@@ -21,6 +22,7 @@ export class GetOrderByIdController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get(':id')
+  @WithOptionalAuth()
   @ApiOperation({
     summary: 'Find an item with its id',
     description: 'Returns an existing item by querying it with its id',
@@ -29,12 +31,34 @@ export class GetOrderByIdController {
   @ApiNotFoundResponse()
   @ApiBadRequestResponse()
   @ApiInternalServerErrorResponse()
-  async execute(@Param('id', new ObjectIdValidationPipe()) id: string) {
+  async execute(
+    @Param('id', new ObjectIdValidationPipe()) id: string,
+    @AuthUser() user: User,
+  ) {
     const result = await this.queryBus.execute<
       GetOrderByIdQuery,
       GetOrderByIdResult
     >(new GetOrderByIdQuery(id));
-
+    if (result.data.requester) {
+      return this.handleNonAnonymousOrder(result, user);
+    }
     return result.data;
+  }
+
+  private handleNonAnonymousOrder(result: GetOrderByIdResult, user: User) {
+    const { data } = result;
+    const { requester } = data;
+
+    if (user?.role === ERoles.Admin) {
+      return data;
+    }
+
+    const isUnauthorized = !user;
+    const emailDoesNotMatch = requester.email !== user?.email;
+    const cpfDoesNotMatch = requester.cpf !== user?.cpf;
+    if (isUnauthorized || (emailDoesNotMatch && cpfDoesNotMatch)) {
+      throw new ForbiddenException();
+    }
+    return data;
   }
 }

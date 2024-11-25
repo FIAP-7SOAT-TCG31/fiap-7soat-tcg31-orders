@@ -1,3 +1,4 @@
+import { WithRoles } from '@fiap-burger/setup';
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
@@ -21,6 +22,7 @@ export class CreateItemController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post()
+  @WithRoles('ADMIN')
   @ApiOperation({
     summary: 'Creates a new Item',
     description:

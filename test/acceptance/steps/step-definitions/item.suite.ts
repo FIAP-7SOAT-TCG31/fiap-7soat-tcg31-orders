@@ -1,6 +1,7 @@
 import { faker } from '@faker-js/faker';
 import { And, Given, Suite, Then, When } from '@fiap-burger/acceptance-factory';
 import { HttpService } from '@nestjs/axios';
+import { fakeToken } from 'apps/fiap-burger-orders/test/mocks/mock.token';
 import { strict as assert } from 'assert';
 import { randomUUID } from 'crypto';
 
@@ -30,6 +31,7 @@ export class ItemSuite {
     const response = await this.http.axiosRef.post(
       `http://localhost:3000/v1/items`,
       this.newItemInfo,
+      { headers: { Authorization: fakeToken.admin } },
     );
     this.targetId = response.data.id;
   }

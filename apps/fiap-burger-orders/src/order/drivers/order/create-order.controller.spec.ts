@@ -35,8 +35,7 @@ describe('CreateOrderController', () => {
     const { items, requester } = values;
     const input = new CreateOrderInput();
     input.items = items;
-    input.requester = requester;
-    await target.execute(input);
+    await target.execute(input, requester);
     expect(commandBus.execute).toHaveBeenCalledWith(
       new CreateOrderCommand(input),
     );
@@ -46,7 +45,7 @@ describe('CreateOrderController', () => {
     const err = new Error('Too Bad');
     jest.spyOn(commandBus, 'execute').mockRejectedValue(err);
     const input = new CreateOrderInput();
-    await expect(() => target.execute(input)).rejects.toThrow(err);
+    await expect(() => target.execute(input, null)).rejects.toThrow(err);
     expect(commandBus.execute).toHaveBeenCalledWith(
       new CreateOrderCommand(input),
     );

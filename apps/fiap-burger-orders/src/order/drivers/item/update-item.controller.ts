@@ -1,3 +1,4 @@
+import { WithRoles } from '@fiap-burger/setup';
 import { Body, Controller, HttpCode, Param, Put } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
@@ -18,6 +19,7 @@ export class UpdateItemController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Put(':id')
+  @WithRoles('ADMIN')
   @ApiOperation({
     summary: 'Updates an existing item',
     description: 'Updates values of an existing item',
