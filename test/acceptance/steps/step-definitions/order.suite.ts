@@ -4,6 +4,7 @@ import { HttpService } from '@nestjs/axios';
 import { strict as assert } from 'assert';
 import { randomUUID } from 'crypto';
 import { setTimeout } from 'timers/promises';
+import { fakeToken } from './utils/token';
 
 @Suite()
 export class OrderSuite {
@@ -30,6 +31,7 @@ export class OrderSuite {
         type: 'Snack',
         images: ['https://anyurl.com'],
       },
+      { headers: { Authorization: fakeToken.admin } },
     );
     this.itemId = res.data.id;
   }
@@ -72,9 +74,13 @@ export class OrderSuite {
     } while (!preparationId && counter++ <= 10);
     await this.http.axiosRef.patch(
       `${this.preparationServiceBaseURL}/v1/preparations/${preparationId}/advance`,
+      {},
+      { headers: { Authorization: fakeToken.admin } },
     );
     await this.http.axiosRef.patch(
       `${this.preparationServiceBaseURL}/v1/preparations/${preparationId}/advance`,
+      {},
+      { headers: { Authorization: fakeToken.admin } },
     );
   }
 
@@ -82,6 +88,8 @@ export class OrderSuite {
   async pickUpOrder() {
     await this.http.axiosRef.post(
       `${this.orderServiceBaseURL}/v1/orders/${this.orderId}/complete`,
+      {},
+      { headers: { Authorization: fakeToken.admin } },
     );
   }
   @Then('the order is marked complete')
