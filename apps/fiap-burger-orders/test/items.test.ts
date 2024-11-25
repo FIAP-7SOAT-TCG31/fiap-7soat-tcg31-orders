@@ -6,6 +6,7 @@ import { Types } from 'mongoose';
 import * as request from 'supertest';
 import { App } from 'supertest/types';
 import { createTestApp } from './create-app';
+import { fakeToken } from './mocks/mock.token';
 
 const basePath = '/v1/items';
 
@@ -44,15 +45,40 @@ describe('Items', () => {
     it('should create a new item', async () => {
       const postResponse = await request(server)
         .post(basePath)
+        .set('Authorization', fakeToken.admin)
         .send(randomItem());
       const { statusCode, body } = postResponse;
       expect(statusCode).toBe(201);
       expect(body).toEqual({ id: expect.any(String) });
     });
+
+    it('should reject request when unauthorized', async () => {
+      const postResponse = await request(server)
+        .post(basePath)
+        .send(randomItem());
+      const { statusCode } = postResponse;
+      expect(statusCode).toBe(401);
+    });
+
+    it('should reject request when authorized with customer role', async () => {
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.customer)
+        .send(randomItem());
+      const { statusCode } = postResponse;
+      expect(statusCode).toBe(403);
+    });
+
     it('should not allow creating the same item', async () => {
       const item = randomItem();
-      await request(server).post(basePath).send(item);
-      const postResponse = await request(server).post(basePath).send(item);
+      await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { statusCode } = postResponse;
       expect(statusCode).toBe(422);
     });
@@ -61,7 +87,10 @@ describe('Items', () => {
   describe('GET /v1/items/:id', () => {
     it('should return existing items', async () => {
       const item = randomItem();
-      const postResponse = await request(server).post(basePath).send(item);
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { id } = postResponse.body;
 
       const getResponse = await request(server).get(`${basePath}/${id}`);
@@ -92,11 +121,15 @@ describe('Items', () => {
     it('should update an existing item', async () => {
       const item = randomItem();
       const otherItem = randomItem();
-      const postResponse = await request(server).post(basePath).send(item);
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { id } = postResponse.body;
 
       const putResponse = await request(server)
         .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.admin)
         .send(otherItem);
       expect(putResponse.status).toBe(204);
 
@@ -111,13 +144,48 @@ describe('Items', () => {
       expect(getResponse.body.images).toEqual(otherItem.images);
     });
 
-    it('should return bad request if no values are provided for update', async () => {
+    it('should reject when unauthorized', async () => {
       const item = randomItem();
-      const postResponse = await request(server).post(basePath).send(item);
+      const otherItem = randomItem();
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { id } = postResponse.body;
 
       const putResponse = await request(server)
         .put(`${basePath}/${id}`)
+        .send(otherItem);
+      expect(putResponse.status).toBe(401);
+    });
+
+    it('should reject when unauthorized', async () => {
+      const item = randomItem();
+      const otherItem = randomItem();
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
+      const { id } = postResponse.body;
+
+      const putResponse = await request(server)
+        .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.customer)
+        .send(otherItem);
+      expect(putResponse.status).toBe(403);
+    });
+
+    it('should return bad request if no values are provided for update', async () => {
+      const item = randomItem();
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
+      const { id } = postResponse.body;
+
+      const putResponse = await request(server)
+        .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.admin)
         .send({});
       expect(putResponse.status).toBe(400);
     });
@@ -125,12 +193,19 @@ describe('Items', () => {
     it('should return unprocessable entity if new item name already exists', async () => {
       const item = randomItem();
       const otherItem = randomItem();
-      const postResponse = await request(server).post(basePath).send(item);
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { id } = postResponse.body;
-      await request(server).post(basePath).send(otherItem);
+      await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(otherItem);
 
       const putResponse = await request(server)
         .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.admin)
         .send({ name: otherItem.name });
       expect(putResponse.status).toBe(422);
     });
@@ -139,6 +214,7 @@ describe('Items', () => {
       const id = new Types.ObjectId().toHexString();
       const getResponse = await request(server)
         .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.admin)
         .send({
           name: `${faker.food.adjective()} ${faker.food.dish()}`,
         });
@@ -147,15 +223,24 @@ describe('Items', () => {
 
     it('should return bad request if an invalid id is provided', async () => {
       const id = randomUUID();
-      const getResponse = await request(server).get(`${basePath}/${id}`);
-      expect(getResponse.statusCode).toBe(400);
+      const targetResponse = await request(server)
+        .put(`${basePath}/${id}`)
+        .set('Authorization', fakeToken.admin)
+        .send({
+          name: `${faker.food.adjective()} ${faker.food.dish()}`,
+        });
+
+      expect(targetResponse.statusCode).toBe(400);
     });
   });
 
   describe('GET /v1/items/:id', () => {
     it('should return existing items', async () => {
       const item = randomItem();
-      const postResponse = await request(server).post(basePath).send(item);
+      const postResponse = await request(server)
+        .post(basePath)
+        .set('Authorization', fakeToken.admin)
+        .send(item);
       const { id } = postResponse.body;
 
       const getResponse = await request(server).get(`${basePath}/${id}`);

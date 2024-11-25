@@ -1,3 +1,4 @@
+import { AuthUser, User, WithOptionalAuth } from '@fiap-burger/setup';
 import { Body, Controller, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
@@ -21,6 +22,7 @@ export class CreateOrderController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post()
+  @WithOptionalAuth()
   @ApiOperation({
     summary: 'Creates a new order',
     description: 'Creates a new order',
@@ -29,13 +31,8 @@ export class CreateOrderController {
   @ApiBadRequestResponse()
   @ApiUnprocessableEntityResponse()
   @ApiInternalServerErrorResponse()
-  async execute(@Body() data: CreateOrderInput) {
-    /**
-     * TODO: Add authentication user as requester
-     * Add an @Roles auth guard too taking form token
-     * @AuthUser() user: { email?, cpf?, name}
-     * data.requester = user;
-     */
+  async execute(@Body() data: CreateOrderInput, @AuthUser() user: User) {
+    data.requester = user;
     const result = await this.commandBus.execute<
       CreateOrderCommand,
       CreateOrderResult

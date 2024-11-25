@@ -21,6 +21,7 @@ import {
   destroyMockService,
 } from './create-app';
 import { populateItems } from './create-items';
+import { fakeToken } from './mocks/mock.token';
 
 const basePath = '/v1/orders';
 const exchanges = {
@@ -35,17 +36,24 @@ describe('Orders', () => {
   let items: { id: string }[];
 
   const getOrder = async (id: string): Promise<Order> => {
-    const response = await request(server).get(`${basePath}/${id}`);
+    const response = await request(server)
+      .get(`${basePath}/${id}`)
+      .set('Authorization', fakeToken.admin);
     return response.body;
   };
 
   const createOrder = async (): Promise<string> => {
-    const response = await request(server).post(basePath).send({ items });
+    const response = await request(server)
+      .post(basePath)
+      .set('Authorization', fakeToken.admin)
+      .send({ items });
     return response.body.id;
   };
 
   const checkoutOrder = async (id: string) => {
-    await request(server).post(`${basePath}/${id}/checkout`);
+    await request(server)
+      .post(`${basePath}/${id}/checkout`)
+      .set('Authorization', fakeToken.admin);
   };
 
   const publishAggregateEvent = async (
@@ -186,7 +194,9 @@ describe('Orders', () => {
       it('should return all orders without any filters', async () => {
         const orderId = await createOrder();
         await checkoutOrder(orderId);
-        const targetResponse = await request(server).get(basePath);
+        const targetResponse = await request(server)
+          .get(basePath)
+          .set('Authorization', fakeToken.admin);
         expect(targetResponse.statusCode).toBe(200);
       });
       it('should return orders in given date range filters', async () => {
@@ -196,6 +206,7 @@ describe('Orders', () => {
         const orderId = await createOrder();
         const targetResponse = await request(server)
           .get(basePath)
+          .set('Authorization', fakeToken.admin)
           .query({
             from: from.toISOString().slice(0, 10),
             to: to.toISOString().slice(0, 10),
@@ -210,6 +221,7 @@ describe('Orders', () => {
         const to = new Date();
         const targetResponse = await request(server)
           .get(basePath)
+          .set('Authorization', fakeToken.admin)
           .query({
             to: to.toISOString().slice(0, 10),
           });
@@ -222,6 +234,7 @@ describe('Orders', () => {
         from.setDate(from.getDate() + 1);
         const targetResponse = await request(server)
           .get(basePath)
+          .set('Authorization', fakeToken.admin)
           .query({
             from: from.toISOString().slice(0, 10),
           });
@@ -235,6 +248,7 @@ describe('Orders', () => {
         const status = 'Created';
         const targetResponse = await request(server)
           .get(basePath)
+          .set('Authorization', fakeToken.admin)
           .query({ email, cpf, status });
         const data = targetResponse.body.data;
         expect(data).toEqual([]);
@@ -250,9 +264,9 @@ describe('Orders', () => {
         const { preparationId } = await getOrder(orderId);
         await publishPreparationStarted(preparationId);
         await publishPreparationCompleted(preparationId);
-        const targetResponse = await request(server).post(
-          `${basePath}/${orderId}/complete`,
-        );
+        const targetResponse = await request(server)
+          .post(`${basePath}/${orderId}/complete`)
+          .set('Authorization', fakeToken.admin);
         const target = await getOrder(orderId);
         expect(targetResponse.statusCode).toBe(200);
         expect(target.status).toBe(EOrderStatus.Completed);
@@ -260,9 +274,9 @@ describe('Orders', () => {
 
       it('should return error when order is in an invalid status', async () => {
         const orderId = await createOrder();
-        const targetResponse = await request(server).post(
-          `${basePath}/${orderId}/complete`,
-        );
+        const targetResponse = await request(server)
+          .post(`${basePath}/${orderId}/complete`)
+          .set('Authorization', fakeToken.admin);
         const target = await getOrder(orderId);
         expect(targetResponse.statusCode).toBe(422);
         expect(target.status).toBe(EOrderStatus.Initiated);
@@ -270,9 +284,9 @@ describe('Orders', () => {
 
       it('should return not found when order does not exist', async () => {
         const orderId = new Types.ObjectId().toHexString();
-        const targetResponse = await request(server).post(
-          `${basePath}/${orderId}/complete`,
-        );
+        const targetResponse = await request(server)
+          .post(`${basePath}/${orderId}/complete`)
+          .set('Authorization', fakeToken.admin);
         const { statusCode } = targetResponse;
         expect(statusCode).toBe(404);
       });
@@ -411,13 +425,52 @@ describe('Orders', () => {
     });
 
     describe('GET /v1/orders/:id', () => {
-      it('should return existing order', async () => {
-        const postResponse = await request(server).post(basePath);
-        const id = postResponse.body.id;
-        const getResponse = await request(server).get(`${basePath}/${id}`);
-        const { statusCode, body } = getResponse;
-        expect(statusCode).toBe(200);
-        expect(body.id).toBe(id);
+      describe('Anonymous Order', () => {
+        it('should return existing order', async () => {
+          const postResponse = await request(server).post(basePath);
+          const id = postResponse.body.id;
+          const getResponse = await request(server).get(`${basePath}/${id}`);
+          const { statusCode, body } = getResponse;
+          expect(statusCode).toBe(200);
+          expect(body.id).toBe(id);
+        });
+      });
+
+      describe('Identified Order', () => {
+        it('should return existing order when admin request', async () => {
+          const postResponse = await request(server)
+            .post(basePath)
+            .set('Authorization', fakeToken.customer);
+          const id = postResponse.body.id;
+          const getResponse = await request(server)
+            .get(`${basePath}/${id}`)
+            .set('Authorization', fakeToken.admin);
+          const { statusCode, body } = getResponse;
+          expect(statusCode).toBe(200);
+          expect(body.id).toBe(id);
+        });
+
+        it('should not return existing order when different user', async () => {
+          const postResponse = await request(server)
+            .post(basePath)
+            .set('Authorization', fakeToken.admin);
+          const id = postResponse.body.id;
+          const getResponse = await request(server)
+            .get(`${basePath}/${id}`)
+            .set('Authorization', fakeToken.customer);
+          const { statusCode } = getResponse;
+          expect(statusCode).toBe(403);
+        });
+
+        it('should not return order when empty auth', async () => {
+          const postResponse = await request(server)
+            .post(basePath)
+            .set('Authorization', fakeToken.customer);
+          const id = postResponse.body.id;
+          const getResponse = await request(server).get(`${basePath}/${id}`);
+          const { statusCode } = getResponse;
+          expect(statusCode).toBe(403);
+        });
       });
 
       it('should not found when order does not exist', async () => {

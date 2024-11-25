@@ -1,3 +1,4 @@
+import { WithRoles } from '@fiap-burger/setup';
 import { Controller, HttpCode, Param, Post } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
@@ -17,6 +18,7 @@ export class CompleteOrderController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post(':id/complete')
+  @WithRoles('ADMIN')
   @HttpCode(200)
   @ApiOperation({
     summary: 'Complete Order',
