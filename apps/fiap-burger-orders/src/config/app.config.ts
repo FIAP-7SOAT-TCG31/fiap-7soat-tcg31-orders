@@ -28,7 +28,7 @@ export class AppConfig implements CommonOptionsFactory {
       routePrefix,
       httpTrafficInspection: {
         mode: httpTrafficInspectionMode,
-        ignoredInboundRoutes: ['/healthz*'],
+        ignoredInboundRoutes: ['*healthz*'],
         enabledOutboundHosts: ['*.requestinspector.com', 'localhost'],
       },
       logger: {
