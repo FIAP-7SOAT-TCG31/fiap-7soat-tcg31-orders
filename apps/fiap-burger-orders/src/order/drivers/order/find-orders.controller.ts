@@ -1,3 +1,4 @@
+import { WithRoles } from '@fiap-burger/setup';
 import { Controller, Get, Query } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import {
@@ -21,6 +22,7 @@ export class FindOrdersController {
   constructor(private readonly queryBus: QueryBus) {}
 
   @Get()
+  @WithRoles('ADMIN')
   @ApiOperation({
     summary: 'Find orders with the given criteria',
     description: 'Returns orders that match provided criteria',
