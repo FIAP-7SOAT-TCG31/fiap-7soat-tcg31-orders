@@ -48,10 +48,10 @@ spec:
               containerPort: 3000
           resources:
             requests:
-              cpu: 10m
+              cpu: 20m
               memory: "128Mi"
             limits:
-              cpu: 50m
+              cpu: 150m
               memory: "256Mi"
           livenessProbe:
             initialDelaySeconds: 10
