@@ -1,4 +1,4 @@
-@Payment
+@OrderPlacement
 Feature: Request Orders
   Allow customers to place orders
 
