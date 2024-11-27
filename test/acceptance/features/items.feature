@@ -1,4 +1,4 @@
-@Payment
+@Catalogue
 Feature: Items
   Allows collaborators items
 
