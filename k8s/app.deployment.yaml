@@ -13,7 +13,7 @@ spec:
       labels:
         app: fiap-burger-orders
     spec:
-      terminationGracePeriod: 90
+      terminationGracePeriodSeconds: 90
       automountServiceAccountToken: false
       containers:
         - name: fiap-burger-orders-app
@@ -28,7 +28,7 @@ spec:
             - name: APP_NAME
               value: "FiapBurgerOrder"
             - name: APP_DESCRIPTION
-              value: "Payments Component for Fiap Burger"
+              value: "Orders Component for Fiap Burger"
             - name: APP_VERSION
               value: "1.0.0"
             - name: PORT
@@ -42,7 +42,7 @@ spec:
             - name: TRAFFIC_INSPECTION_AMQP
               value: "all" # inbound|outbound|all|none
             - name: ROUTE_PREFIX
-              value: ""
+              value: "fiap-burger-orders"
           ports:
             - name: http
               containerPort: 3000
@@ -58,13 +58,13 @@ spec:
             failureThreshold: 3
             periodSeconds: 15
             httpGet:
-              path: /healthz
+              path: /fiap-burger-orders/healthz
               port: 3000
           readinessProbe:
             initialDelaySeconds: 10
             periodSeconds: 10
             httpGet:
-              path: /healthz/self
+              path: /fiap-burger-orders/healthz/self
               port: 3000
 ---
 apiVersion: autoscaling/v2

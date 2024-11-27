@@ -108,7 +108,7 @@ export const configureHttpInspectorInbound = (app: INestApplication) => {
     return app;
   }
 
-  ignoreRoutes.push('/docs*');
+  ignoreRoutes.push('/docs*', '/favicon*');
 
   if (ignoreRoutes) {
     Logger.log(
