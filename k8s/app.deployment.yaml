@@ -13,7 +13,7 @@ spec:
       labels:
         app: fiap-burger-orders
     spec:
-      terminationGracePeriod: 90
+      terminationGracePeriodSeconds: 90
       automountServiceAccountToken: false
       containers:
         - name: fiap-burger-orders-app
