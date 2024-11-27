@@ -42,7 +42,7 @@ spec:
             - name: TRAFFIC_INSPECTION_AMQP
               value: "all" # inbound|outbound|all|none
             - name: ROUTE_PREFIX
-              value: "fiap-burger-orders"
+              value: "dev/fiap-burger-orders"
           ports:
             - name: http
               containerPort: 3000
@@ -58,13 +58,13 @@ spec:
             failureThreshold: 3
             periodSeconds: 15
             httpGet:
-              path: /fiap-burger-orders/healthz
+              path: /dev/fiap-burger-orders/healthz
               port: 3000
           readinessProbe:
             initialDelaySeconds: 10
             periodSeconds: 10
             httpGet:
-              path: /fiap-burger-orders/healthz/self
+              path: /dev/fiap-burger-orders/healthz/self
               port: 3000
 ---
 apiVersion: autoscaling/v2
